@@ -14,19 +14,19 @@ def gerar_questoes_agora():
     try:
         genai.configure(api_key=minha_chave)
         
-        # Vamos tentar o modelo mais básico e garantido do Google
-        # Se este falhar, o erro vai aparecer na tela
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Vamos tentar o modelo flash-latest
+        model = genai.GenerativeModel('models/gemini-flash-latest')
         
         temas = ["Porcentagem", "Áreas", "Média", "Equações"]
         tema_vez = random.choice(temas)
 
+        # A CORREÇÃO ESTÁ AQUI EMBAIXO (Nas chaves duplas {{ }})
         prompt = f"""
         Gere um JSON puro com 3 questões de matemática sobre: {tema_vez}.
         REGRAS: 
         1. Responda APENAS o JSON.
         2. Texto simples (sem LaTeX).
-        Formato: [{"id":1, "tema":"{tema_vez}", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "explicacao":"..."}]
+        Formato: [{{ "id":1, "tema":"{tema_vez}", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "explicacao":"..." }}]
         """
         
         response = model.generate_content(prompt)
@@ -40,8 +40,7 @@ def gerar_questoes_agora():
         return dados 
 
     except Exception as e:
-        # AQUI É O PULO DO GATO:
-        # Em vez de backup, ele mostra o erro na tela pra gente consertar!
+        # Mostra o erro na tela se falhar de novo
         return [{
             "id": 1, 
             "tema": "⚠️ ERRO TÉCNICO", 
