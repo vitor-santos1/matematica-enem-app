@@ -10,59 +10,78 @@ try:
 except:
     minha_chave = "COLE_SUA_CHAVE_AQUI"
 
-def gerar_questoes_agora():
-    tentativas = 0
-    # Tenta até 3 vezes se der erro
-    while tentativas < 3:
-        print(f"--- GERANDO LOTE (Tentativa {tentativas+1}) ---")
-        try:
-            genai.configure(api_key=minha_chave)
-            model = genai.GenerativeModel('models/gemini-flash-latest')
-
-            # TRUQUE DO ATACADO: Pedimos 5 questões de uma vez!
-            # Isso conta como apenas 1 chamada na API.
-            prompt = """
-            Gere um JSON puro com 5 questões de matemática ENEM.
-            
-            REGRAS OBRIGATÓRIAS:
-            1. Responda APENAS o JSON.
-            2. NÃO use Markdown. NÃO use LaTeX.
-            3. Texto simples e direto.
-            4. Varie os temas: 1 de Porcentagem, 1 de Geometria, 1 de Lógica, 1 de Equação, 1 de Regra de Três.
-            
-            Formato: 
-            [
-                {"id":1, "tema":"Tema A", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "explicacao":"..."},
-                {"id":2, "tema":"Tema B", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "explicacao":"..."}
-            ]
-            """
-            
-            response = model.generate_content(prompt)
-            texto = response.text.replace("```json", "").replace("```", "").strip()
-            
-            if not texto: raise ValueError("Vazio")
-            
-            dados = json.loads(texto)
-            
-            # Ajusta IDs para ficarem bonitinhos (1, 2, 3, 4, 5)
-            for i, q in enumerate(dados): 
-                q['id'] = i + 1
-            
-            return dados # Retorna o pacote com 5 perguntas
-
-        except Exception as e:
-            erro = str(e).lower()
-            if "429" in erro or "quota" in erro:
-                print("⚠️ Cota cheia. Esperando um pouco...")
-                time.sleep(5)
-                tentativas += 1
-            else:
-                print(f"⚠️ Erro formatação: {e}")
-                tentativas += 1
+# --- GERADOR MATEMÁTICO (Caso a IA falhe, ele cria matemática na hora) ---
+def gerar_backup_infinito():
+    questoes = []
     
-    # Se falhar tudo, entrega um pacote de emergência manual
-    return [
-        {"id": 1, "tema": "Backup", "pergunta": "Quanto é 10 + 10?", "opcoes":["20","30"], "correta":"20", "explicacao":"Simples."},
-        {"id": 2, "tema": "Backup", "pergunta": "Quanto é 50% de 100?", "opcoes":["50","25"], "correta":"50", "explicacao":"Metade."},
-        {"id": 3, "tema": "Backup", "pergunta": "3 x 3?", "opcoes":["9","6"], "correta":"9", "explicacao":"Tabuada."}
-    ]
+    # 1. SOMA/SUBTRAÇÃO ALEATÓRIA
+    n1 = random.randint(10, 200)
+    n2 = random.randint(5, 100)
+    op = random.choice(['+', '-'])
+    res = n1 + n2 if op == '+' else n1 - n2
+    questoes.append({
+        "id": 1, "tema": "Cálculo Rápido (Modo Infinito)",
+        "pergunta": f"Quanto é {n1} {op} {n2}?",
+        "opcoes": [str(res), str(res+5), str(res-2), str(res+10)],
+        "correta": str(res), "explicacao": "Cálculo básico."
+    })
+
+    # 2. PORCENTAGEM ALEATÓRIA
+    total = random.choice([50, 100, 200, 400, 500, 1000])
+    perc = random.choice([10, 20, 25, 50])
+    res_p = int(total * (perc/100))
+    questoes.append({
+        "id": 2, "tema": "Porcentagem (Modo Infinito)",
+        "pergunta": f"Quanto é {perc}% de {total}?",
+        "opcoes": [str(res_p), str(res_p+10), str(res_p*2), str(int(res_p/2))],
+        "correta": str(res_p), "explicacao": f"{perc}% de {total} é {res_p}."
+    })
+
+    # 3. GEOMETRIA ALEATÓRIA
+    lado = random.randint(3, 12)
+    area = lado * lado
+    questoes.append({
+        "id": 3, "tema": "Geometria (Modo Infinito)",
+        "pergunta": f"Qual a área de um quadrado de lado {lado}m?",
+        "opcoes": [f"{area}m²", f"{area+5}m²", f"{area*2}m²", f"{lado*4}m²"],
+        "correta": f"{area}m²", "explicacao": f"Área = Lado x Lado ({lado} x {lado})."
+    })
+
+    # 4. REGRA DE TRÊS
+    qtd = random.randint(2, 5)
+    preco_un = random.randint(2, 10)
+    total_re = qtd * preco_un
+    questoes.append({
+        "id": 4, "tema": "Regra de Três (Modo Infinito)",
+        "pergunta": f"Se 1 caneta custa R$ {preco_un}, quanto custam {qtd} canetas?",
+        "opcoes": [f"R$ {total_re}", f"R$ {total_re+2}", f"R$ {total_re-1}", f"R$ {total_re*2}"],
+        "correta": f"R$ {total_re}", "explicacao": "Multiplicação simples."
+    })
+
+    return questoes
+
+def gerar_questoes_agora():
+    # Tenta usar a IA primeiro
+    try:
+        genai.configure(api_key=minha_chave)
+        model = genai.GenerativeModel('models/gemini-flash-latest')
+
+        prompt = """
+        Gere um JSON puro com 4 questões de matemática ENEM variadas.
+        REGRAS: 
+        1. APENAS JSON. Sem markdown. 
+        2. Texto simples.
+        Formato: [{"id":1, "tema":"x", "pergunta":"x", "opcoes":["A","B"], "correta":"A", "explicacao":"x"}]
+        """
+        
+        response = model.generate_content(prompt)
+        texto = response.text.replace("```json", "").replace("```", "").strip()
+        dados = json.loads(texto)
+        
+        for i, q in enumerate(dados): q['id'] = i + 1
+        return dados 
+
+    except Exception as e:
+        print(f"⚠️ IA falhou: {e}. Gerando matemática aleatória.")
+        # SE A IA FALHAR, ELE CHAMA O GERADOR INFINITO (NUNCA REPETE)
+        return gerar_backup_infinito()
