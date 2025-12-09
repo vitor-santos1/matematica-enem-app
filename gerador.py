@@ -7,7 +7,7 @@ import streamlit as st
 try:
     minha_chave = st.secrets["GOOGLE_API_KEY"]
 except:
-    minha_chave = "COLE_SUA_CHAVE_AQUI" # Só usa se rodar no PC
+    minha_chave = "AIzaSyD-ox5a1bK-san7Ki3qcNkZr-8fsPTT3KE" # Só usa se rodar no PC
 
 # --- PERGUNTAS DE EMERGÊNCIA (BACKUP) ---
 BACKUP_QUESTOES = [
@@ -62,4 +62,5 @@ def gerar_questoes():
 
 if __name__ == "__main__":
     gerar_questoes()
+
 
