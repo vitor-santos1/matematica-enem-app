@@ -1,29 +1,25 @@
 import streamlit as st
-import json
-import os
 import random
-import time
-import gerador 
+import gerador # Importa o arquivo novo
 
 st.set_page_config(page_title="Math Trainer", page_icon="📐", layout="centered")
 
-# --- AUTO-VERIFICAÇÃO ---
-# Se não tiver perguntas, gera agora (IA ou Backup)
-if not os.path.exists("banco_questoes.json"):
-    gerador.gerar_questoes()
+# --- CSS PARA BOTÕES GRANDES ---
+st.markdown("""
+<style>
+div.stButton > button {
+    width: 100%;
+    height: 60px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 12px;
+}
+</style>""", unsafe_allow_html=True)
 
-def load_data():
-    try:
-        with open("banco_questoes.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return []
-
-# --- ESTADO ---
-if 'questoes' not in st.session_state or not st.session_state.questoes:
-    st.session_state.questoes = load_data()
-    if st.session_state.questoes:
-        random.shuffle(st.session_state.questoes)
+# --- INICIALIZAÇÃO ---
+if 'questoes' not in st.session_state:
+    # Começa gerando perguntas direto
+    st.session_state.questoes = gerador.gerar_questoes_agora()
 
 if 'indice' not in st.session_state:
     st.session_state.indice = 0
@@ -34,39 +30,51 @@ if 'indice' not in st.session_state:
 # --- TELA FINAL ---
 if not st.session_state.questoes or st.session_state.indice >= len(st.session_state.questoes):
     st.balloons()
-    st.title("🎉 Treino Finalizado!")
-    st.write(f"### Acertos: {st.session_state.acertos} de {len(st.session_state.questoes)}")
+    st.success(f"🎉 FIM! Você acertou {st.session_state.acertos} de {len(st.session_state.questoes)}")
     
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🔄 Refazer"):
+        if st.button("🔄 Refazer Mesmas"):
             st.session_state.indice = 0
             st.session_state.acertos = 0
             st.session_state.respondido = False
-            random.shuffle(st.session_state.questoes)
             st.rerun()
+            
     with col2:
-        if st.button("✨ Novas Perguntas"):
-            with st.spinner("Gerando..."):
-                gerador.gerar_questoes()
-                del st.session_state.questoes # Limpa memória
+        # AQUI É O PULO DO GATO
+        if st.button("✨ Gerar Novas (IA)"):
+            with st.spinner("A IA está criando perguntas fresquinhas..."):
+                # Chama a função e joga direto na variável, sem passar por arquivo
+                novas = gerador.gerar_questoes_agora()
+                st.session_state.questoes = novas
+                
+                # Reseta contadores
+                st.session_state.indice = 0
+                st.session_state.acertos = 0
+                st.session_state.respondido = False
                 st.rerun()
     st.stop()
 
 # --- QUIZ ---
 q = st.session_state.questoes[st.session_state.indice]
-total = len(st.session_state.questoes)
 
-st.progress((st.session_state.indice) / total)
-st.caption(f"Questão {st.session_state.indice + 1}/{total}")
-st.markdown(f"### {q['pergunta']}")
+# Barra de progresso
+st.progress((st.session_state.indice) / len(st.session_state.questoes))
+st.caption(f"Questão {st.session_state.indice + 1}")
+
+st.markdown(f"### {q['tema']}")
+st.write(f"## {q['pergunta']}")
 
 if not st.session_state.respondido:
-    with st.form("quiz"):
-        opcoes = q['opcoes']
+    with st.form("form_quiz"):
+        # Mistura opções para não viciar
+        opcoes = q['opcoes'].copy()
         if q['correta'] not in opcoes: opcoes.append(q['correta'])
-        escolha = st.radio("Alternativas:", opcoes, index=None)
-        if st.form_submit_button("Responder"):
+        
+        escolha = st.radio("Sua resposta:", opcoes, index=None)
+        
+        # Botão de Enviar dentro do form
+        if st.form_submit_button("Confirmar Resposta"):
             if escolha:
                 st.session_state.respondido = True
                 if escolha == q['correta']:
@@ -75,14 +83,18 @@ if not st.session_state.respondido:
                 else:
                     st.session_state.acertou_atual = False
                 st.rerun()
+            else:
+                st.warning("Selecione uma alternativa!")
 else:
+    # Feedback
     if st.session_state.acertou_atual:
-        st.success("✅ Acertou!")
+        st.success("✅ ACERTOU!")
     else:
-        st.error(f"❌ Era: {q['correta']}")
-    st.info(f"Explicação: {q.get('explicacao','')}")
-    if st.button("Próxima ➡️"):
+        st.error(f"❌ Errado! A correta era: {q['correta']}")
+    
+    st.info(f"💡 {q.get('explicacao', 'Sem explicação.')}")
+    
+    if st.button("Próxima Questão ➡️"):
         st.session_state.indice += 1
         st.session_state.respondido = False
         st.rerun()
-
