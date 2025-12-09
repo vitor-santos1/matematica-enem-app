@@ -10,45 +10,46 @@ try:
 except:
     minha_chave = "COLE_SUA_CHAVE_AQUI"
 
-# --- 2. PERGUNTAS DE SEGURANÇA (BACKUP) ---
-# Estas perguntas são salvas ANTES de tentar a IA.
-BACKUP_FIXO = [
-    {
-        "id": 1, "tema": "Matemática (Modo Offline)", 
-        "pergunta": "Se um carro anda a 80km/h, quanto ele anda em 2 horas?", 
-        "opcoes": ["100km", "160km", "140km", "120km"], 
-        "correta": "160km", "explicacao": "Distância = Velocidade x Tempo. 80 x 2 = 160."
-    },
-    {
-        "id": 2, "tema": "Porcentagem (Modo Offline)", 
-        "pergunta": "Quanto é 10% de 500?", 
-        "opcoes": ["50", "5", "100", "25"], 
-        "correta": "50", "explicacao": "10% é dividir por 10. 500/10 = 50."
-    }
-]
+# --- 2. BACKUP ALEATÓRIO (Para não ficar repetitivo se a IA falhar) ---
+def pegar_backup():
+    return [
+        {
+            "id": 1, "tema": "Matemática (Modo Offline)", 
+            "pergunta": f"Quanto é {random.randint(2,9)} x {random.randint(5,15)}?", 
+            "opcoes": ["Calculando...", "Verifique na calculadora", "Resultado exato", "Erro"], 
+            "correta": "Resultado exato", "explicacao": "Multiplicação simples."
+        },
+        {
+            "id": 2, "tema": "Porcentagem (Modo Offline)", 
+            "pergunta": "Quanto é 50% de 200?", 
+            "opcoes": ["100", "50", "20", "150"], 
+            "correta": "100", "explicacao": "Metade de 200."
+        }
+    ]
 
 def gerar_questoes():
-    print("--- INICIANDO ---")
+    print("--- TENTANDO IA FLASH ---")
     
-    # 3. SALVAR BACKUP PRIMEIRO (Para garantir que algo apareça)
-    with open("banco_questoes.json", "w", encoding="utf-8") as f:
-        json.dump(BACKUP_FIXO, f, ensure_ascii=False, indent=2)
-    print("✅ Perguntas de backup salvas (Garantia).")
-
-    # 4. TENTAR IA (Se der certo, substitui o backup)
     try:
         genai.configure(api_key=minha_chave)
         
-        # Tentando o modelo mais clássico que existe
-        model = genai.GenerativeModel('models/gemini-pro')
+        # VOLTAMOS PARA O MODELO RÁPIDO QUE FUNCIONA NA SUA CONTA
+        model = genai.GenerativeModel('models/gemini-flash-latest')
         
-        prompt = """
-        Gere um JSON puro com 2 questões de matemática ENEM.
-        REGRAS: Responda APENAS o JSON. Sem markdown. Sem LaTeX.
-        Formato: [{"id":1, "tema":"x", "pergunta":"x", "opcoes":["A","B"], "correta":"A", "explicacao":"x"}]
+        # Sorteia tema para obrigar a mudar
+        temas = ["Geometria", "Regra de Três", "Probabilidade", "Médias", "Equações"]
+        tema = random.choice(temas)
+        
+        prompt = f"""
+        Gere um JSON puro com 3 questões de matemática ENEM sobre: {tema}.
+        REGRAS:
+        1. Responda APENAS o JSON.
+        2. NÃO use Markdown. NÃO use LaTeX.
+        3. Texto simples.
+        
+        Formato: [{"id":1, "tema":"{tema}", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "explicacao":"..."}]
         """
         
-        print("⏳ Chamando IA...")
         response = model.generate_content(prompt)
         texto = response.text.replace("```json", "").replace("```", "").strip()
         dados = json.loads(texto)
@@ -56,14 +57,15 @@ def gerar_questoes():
         for i, q in enumerate(dados):
             q['id'] = i + 1
             
-        # SOBRESCREVE O ARQUIVO COM AS NOVAS
         with open("banco_questoes.json", "w", encoding="utf-8") as f:
             json.dump(dados, f, ensure_ascii=False, indent=2)
-        print("✅ SUCESSO! IA substituiu o backup.")
+        print("✅ SUCESSO! Perguntas novas geradas.")
 
     except Exception as e:
-        print(f"⚠️ Falha na IA: {e}. Mantendo o backup.")
-        # Se der erro, não faz nada (o backup já foi salvo lá em cima!)
+        print(f"⚠️ IA falhou: {e}. Usando backup.")
+        # Se falhar, gera um backup
+        with open("banco_questoes.json", "w", encoding="utf-8") as f:
+            json.dump(pegar_backup(), f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     gerar_questoes()
