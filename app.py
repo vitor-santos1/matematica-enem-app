@@ -1,17 +1,23 @@
 import streamlit as st
 import gerador
 
-st.set_page_config(page_title="Math Tutor ENEM", page_icon="🎓", layout="centered")
+st.set_page_config(page_title="Math Tutor", page_icon="📝")
 
-# CSS para ficar bonito
+# CSS para garantir que a resolução apareça bonita
 st.markdown("""
 <style>
-div.stButton > button {width: 100%; border-radius: 10px; font-weight: bold;}
-.explicacao-box {background-color: #f0f2f6; padding: 15px; border-radius: 10px; border-left: 5px solid #4CAF50;}
-.dica-box {background-color: #fff3cd; padding: 10px; border-radius: 10px; border-left: 5px solid #ffc107; color: #856404;}
+.resolucao-box {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #c3e6cb;
+    margin-top: 10px;
+}
+div.stButton > button {width: 100%; height: 50px; font-weight: bold;}
 </style>""", unsafe_allow_html=True)
 
-# --- INICIALIZAÇÃO ---
+# Inicializa
 if 'questoes' not in st.session_state:
     st.session_state.questoes = gerador.gerar_questoes_agora()
 if 'indice' not in st.session_state:
@@ -20,13 +26,13 @@ if 'indice' not in st.session_state:
     st.session_state.respondido = False
     st.session_state.acertou_atual = False
 
-# --- TELA FINAL ---
+# Tela de Final
 if not st.session_state.questoes or st.session_state.indice >= len(st.session_state.questoes):
-    st.balloons()
-    st.title("🎓 Treino Concluído!")
-    st.write(f"Você acertou **{st.session_state.acertos}** de **{len(st.session_state.questoes)}**.")
-    if st.button("✨ Gerar Novo Simulado (IA)"):
-        with st.spinner("O Professor Virtual está elaborando novas questões..."):
+    st.title("🎉 Treino Finalizado!")
+    st.metric("Total de Acertos", f"{st.session_state.acertos} / {len(st.session_state.questoes)}")
+    
+    if st.button("🔄 Gerar Novo Simulado"):
+        with st.spinner("Criando novas questões..."):
             st.session_state.questoes = gerador.gerar_questoes_agora()
             st.session_state.indice = 0
             st.session_state.acertos = 0
@@ -34,26 +40,17 @@ if not st.session_state.questoes or st.session_state.indice >= len(st.session_st
             st.rerun()
     st.stop()
 
-# --- A QUESTÃO ---
+# Mostra Questão
 q = st.session_state.questoes[st.session_state.indice]
-
-st.caption(f"Questão {st.session_state.indice + 1} de {len(st.session_state.questoes)} | Tema: {q['tema']}")
-st.progress((st.session_state.indice) / len(st.session_state.questoes))
-
+st.progress((st.session_state.indice + 1) / len(st.session_state.questoes))
+st.write(f"**Tema:** {q['tema']}")
 st.markdown(f"### {q['pergunta']}")
 
-# --- ÁREA DE RESPOSTA ---
+# Formulário de Resposta
 if not st.session_state.respondido:
-    # 💡 BOTÃO DE DICA (NOVIDADE!)
-    with st.expander("💡 Precisa de uma ajuda? (Dica do Professor)"):
-        st.markdown(f"<div class='dica-box'>{q.get('dica_mestra', 'Leia o enunciado com atenção.')}</div>", unsafe_allow_html=True)
-
     with st.form("quiz"):
-        opcoes = q['opcoes'].copy()
-        if q['correta'] not in opcoes: opcoes.append(q['correta'])
-        escolha = st.radio("Sua resposta:", opcoes, index=None)
-        
-        if st.form_submit_button("Confirmar Resposta"):
+        escolha = st.radio("Escolha a alternativa:", q['opcoes'], index=None)
+        if st.form_submit_button("Confirmar"):
             if escolha:
                 st.session_state.respondido = True
                 if escolha == q['correta']:
@@ -63,18 +60,19 @@ if not st.session_state.respondido:
                     st.session_state.acertou_atual = False
                 st.rerun()
             else:
-                st.warning("Escolha uma alternativa!")
-
-# --- PÓS-RESPOSTA (EXPLICAÇÃO) ---
+                st.warning("Marque uma opção!")
 else:
+    # --- ÁREA DE RESOLUÇÃO (AGORA IMPOSSÍVEL FICAR EM BRANCO) ---
     if st.session_state.acertou_atual:
-        st.success("✅ ACERTOU! Parabéns!")
+        st.success("✅ ACERTOU!")
     else:
-        st.error(f"❌ Que pena! A correta era: {q['correta']}")
+        st.error(f"❌ A correta era: {q['correta']}")
     
-    # 📝 EXPLICAÇÃO DETALHADA (NOVIDADE!)
-    st.markdown("### 📝 Resolução Passo a Passo:")
-    st.markdown(f"<div class='explicacao-box'>{q.get('explicacao', 'Sem explicação disponível.')}</div>", unsafe_allow_html=True)
+    # Busca a explicação. Se não tiver, mostra mensagem padrão.
+    texto_explicacao = q.get('explicacao', 'Resolução detalhada: Aplique a fórmula do tema abordado.')
+    
+    st.markdown("### 📝 Resolução:")
+    st.markdown(f"<div class='resolucao-box'>{texto_explicacao}</div>", unsafe_allow_html=True)
     
     if st.button("Próxima Questão ➡️"):
         st.session_state.indice += 1
