@@ -11,125 +11,131 @@ except:
     minha_chave = "COLE_SUA_CHAVE_AQUI"
 
 # ======================================================
-# 🎲 BANCO DE MOLDES (Sorteia histórias diferentes)
+# 🎲 GERADOR LOCAL (ESTILO ENEM + ALTERNATIVAS ALEATÓRIAS)
 # ======================================================
 def gerar_ia_local_variada():
     moldes = []
 
-    # --- MOLDE 1: ANÁLISE COMBINATÓRIA (Senhas) ---
-    chars = random.randint(3, 5)
-    total_senhas = 10 ** chars
-    moldes.append({
+    # --- MOLDE 1: ANÁLISE COMBINATÓRIA (Senhas Bancárias) ---
+    # Situação: Segurança da informação
+    d1 = random.randint(3, 5) # Dígitos
+    total = 10 ** d1
+    
+    q1 = {
         "id": 0, "tema": "Análise Combinatória",
-        "pergunta": f"Um banco decidiu atualizar seu sistema de segurança e solicitou que todos os clientes criassem novas senhas numéricas formadas por exatamente {chars} algarismos (0 a 9), sendo permitida a repetição de números. Qual o total de senhas possíveis que podem ser criadas nesse novo padrão?",
-        "opcoes": [f"{total_senhas}", f"{total_senhas*10}", f"{10*chars}", f"{9**chars}"],
-        "correta": f"{total_senhas}",
-        "dica_mestra": "Pelo Princípio Fundamental da Contagem, multiplique as possibilidades de cada posição. Temos 10 opções (0-9) para cada vaga.",
-        "explicacao": f"São {chars} posições. Cada uma tem 10 opções. Logo: 10 x 10... ({chars} vezes) = 10^{chars} = {total_senhas}."
-    })
+        "pergunta": f"Por motivos de segurança, um aplicativo bancário exigiu que seus usuários trocassem suas senhas de acesso. A nova regra define que a senha deve ser composta exclusivamente por {d1} algarismos numéricos (0 a 9), sendo permitida a repetição de números em qualquer posição. Um especialista em segurança calculou o total de combinações possíveis para avaliar a vulnerabilidade do sistema. Esse total corresponde a:",
+        "opcoes": [f"{total}", f"{total*10}", f"{10*d1}", f"{9**d1}"],
+        "correta": f"{total}",
+        "dica_mestra": "Pelo Princípio Fundamental da Contagem, se temos 10 opções para a primeira vaga, 10 para a segunda, e assim por diante, devemos multiplicar as possibilidades.",
+        "explicacao": f"Temos {d1} posições. Cada uma aceita 10 números (0 a 9). Logo: 10 x 10... ({d1} vezes) = 10 elevado a {d1} = {total}."
+    }
+    random.shuffle(q1['opcoes']) # <--- O SEGREDO: Mistura as opções A,B,C,D
+    moldes.append(q1)
 
-    # --- MOLDE 2: ESCALA (Mapas) ---
-    escala_cm = random.choice([100, 200, 500, 1000]) # 1:100 etc
-    dist_mapa = random.randint(5, 20) # cm
-    dist_real_cm = dist_mapa * escala_cm
-    dist_real_m = dist_real_cm / 100
-    moldes.append({
-        "id": 0, "tema": "Razão e Proporção (Escala)",
-        "pergunta": f"Em um mapa arquitetônico desenhado na escala 1:{escala_cm}, a medida do comprimento de uma sala é de {dist_mapa} cm. Qual é a medida real, em metros, desse comprimento?",
-        "opcoes": [f"{dist_real_m} m", f"{dist_real_cm} m", f"{dist_real_m/10} m", f"{dist_real_m*10} m"],
-        "correta": f"{dist_real_m} m",
-        "dica_mestra": f"A escala 1:{escala_cm} significa que 1 cm no papel vale {escala_cm} cm na vida real. Converta para metros no final.",
-        "explicacao": f"1. Distância em cm: {dist_mapa} x {escala_cm} = {dist_real_cm} cm. \n2. Converter para metros (dividir por 100): {dist_real_m} metros."
-    })
+    # --- MOLDE 2: ESCALA E CARTOGRAFIA ---
+    # Situação: Arquiteto lendo planta
+    escala = random.choice([50, 100, 200])
+    cm_papel = random.randint(4, 12)
+    m_real = (cm_papel * escala) / 100
+    
+    q2 = {
+        "id": 0, "tema": "Razão e Proporção (Escalas)",
+        "pergunta": f"Um estudante de arquitetura analisa a planta baixa de uma casa desenhada na escala 1:{escala}. Ele mede com uma régua o comprimento da sala de estar no desenho e encontra exatos {cm_papel} cm. Para comprar o piso adequado, ele precisa converter essa medida para a realidade. Qual é o comprimento real dessa sala em metros?",
+        "opcoes": [f"{m_real:.2f} m", f"{m_real*10} m", f"{m_real/10} m", f"{cm_papel * escala} m"],
+        "correta": f"{m_real:.2f} m",
+        "dica_mestra": f"Escala 1:{escala} significa que cada 1 cm no papel vale {escala} cm na vida real. Converta o resultado final de cm para metros.",
+        "explicacao": f"1. Tamanho real em cm: {cm_papel} x {escala} = {cm_papel*escala} cm. \n2. Convertendo para metros (dividir por 100): {m_real:.2f} m."
+    }
+    random.shuffle(q2['opcoes'])
+    moldes.append(q2)
 
-    # --- MOLDE 3: ESTATÍSTICA (Média de Gols/Notas) ---
-    valores = [random.randint(0, 5) for _ in range(5)]
-    soma = sum(valores)
-    media = soma / 5
-    moldes.append({
-        "id": 0, "tema": "Estatística (Média)",
-        "pergunta": f"Um time de futebol marcou a seguinte quantidade de gols nos seus últimos 5 jogos: {valores}. Qual foi a média de gols por partida desse time?",
-        "opcoes": [f"{media:.1f}", f"{media+1:.1f}", f"{soma}", f"{media/2:.1f}"],
+    # --- MOLDE 3: MÉDIA PONDERADA (Notas Escolares) ---
+    # Situação: Cálculo de nota final
+    n1 = random.randint(40, 70)
+    n2 = random.randint(50, 80)
+    p1, p2 = 2, 3
+    media = (n1*p1 + n2*p2) / (p1+p2)
+    
+    q3 = {
+        "id": 0, "tema": "Estatística (Média Ponderada)",
+        "pergunta": f"Em um concurso público, a nota final é calculada através da média ponderada entre duas etapas. A prova objetiva tem peso {p1} e a redação tem peso {p2}. Um candidato obteve {n1} pontos na objetiva e {n2} pontos na redação. Qual foi a nota final desse candidato?",
+        "opcoes": [f"{media:.1f}", f"{(n1+n2)/2:.1f}", f"{media+2:.1f}", f"{media-5:.1f}"],
         "correta": f"{media:.1f}",
-        "dica_mestra": "Para calcular a Média Aritmética Simples, some todos os valores e divida pela quantidade de jogos (5).",
-        "explicacao": f"Soma: {valores[0]}+{valores[1]}+{valores[2]}+{valores[3]}+{valores[4]} = {soma}. \nMédia: {soma} ÷ 5 = {media:.1f}."
-    })
+        "dica_mestra": "Na média ponderada, você multiplica cada nota pelo seu peso, soma os resultados e divide pela soma dos pesos.",
+        "explicacao": f"Cálculo: ({n1}x{p1} + {n2}x{p2}) / ({p1}+{p2}) = ({n1*p1} + {n2*p2}) / 5 = {media:.1f}."
+    }
+    random.shuffle(q3['opcoes'])
+    moldes.append(q3)
 
-    # --- MOLDE 4: PROBABILIDADE (Urna) ---
-    vermelhas = random.randint(3, 10)
-    azuis = random.randint(3, 10)
-    total = vermelhas + azuis
-    prob_azul_pct = int((azuis / total) * 100)
-    moldes.append({
-        "id": 0, "tema": "Probabilidade",
-        "pergunta": f"Em uma urna opaca existem {vermelhas} bolas vermelhas e {azuis} bolas azuis, todas idênticas ao tato. Ao retirar uma bola ao acaso, qual a probabilidade aproximada (em porcentagem) de ela ser AZUL?",
-        "opcoes": [f"{prob_azul_pct}%", f"{100 - prob_azul_pct}%", "50%", f"{int(prob_azul_pct/2)}%"],
-        "correta": f"{prob_azul_pct}%",
-        "dica_mestra": "Probabilidade = (Casos Favoráveis / Casos Totais). Multiplique por 100 para achar a porcentagem.",
-        "explicacao": f"Total de bolas: {total}. Bolas azuis: {azuis}. \nCálculo: {azuis}/{total} = {azuis/total:.2f} = {prob_azul_pct}%."
-    })
-
-    # --- MOLDE 5: FUNÇÃO DE 1º GRAU (Salário Vendedor) ---
-    fixo = random.choice([1000, 1200, 1500])
-    comissao = random.choice([20, 50, 100])
-    vendas = random.randint(5, 15)
-    salario = fixo + (comissao * vendas)
-    moldes.append({
-        "id": 0, "tema": "Funções (Salário)",
-        "pergunta": f"Um vendedor recebe um salário mensal fixo de R$ {fixo},00 mais uma comissão de R$ {comissao},00 por produto vendido. Em um mês onde ele vendeu {vendas} produtos, qual foi seu salário total?",
-        "opcoes": [f"R$ {salario},00", f"R$ {fixo + vendas},00", f"R$ {comissao * vendas},00", f"R$ {salario + 200},00"],
-        "correta": f"R$ {salario},00",
-        "dica_mestra": "A função é Salário = Fixo + (Comissão x Quantidade).",
-        "explicacao": f"Conta: {fixo} + ({comissao} x {vendas}) \n= {fixo} + {comissao*vendas} \n= R$ {salario},00."
-    })
+    # --- MOLDE 4: GEOMETRIA ESPACIAL (Piscina) ---
+    c = random.randint(5, 10)
+    l = random.randint(3, 6)
+    p = 2
+    vol_m3 = c * l * p
+    vol_litros = vol_m3 * 1000
     
-    # --- MOLDE 6: GEOMETRIA (Área Piso) ---
-    lado1 = random.randint(3, 8)
-    lado2 = random.randint(4, 10)
-    area = lado1 * lado2
-    custo = random.randint(20, 60)
-    total_piso = area * custo
-    moldes.append({
-        "id": 0, "tema": "Geometria e Orçamento",
-        "pergunta": f"Deseja-se trocar o piso de uma sala retangular de {lado1}m por {lado2}m. O pedreiro cobra R$ {custo},00 por metro quadrado (m²) instalado. Qual será o custo total da mão de obra?",
-        "opcoes": [f"R$ {total_piso},00", f"R$ {area * 10},00", f"R$ {total_piso/2},00", f"R$ {custo * 10},00"],
-        "correta": f"R$ {total_piso},00",
-        "dica_mestra": "Calcule a área da sala (Base x Altura) e multiplique pelo preço do m².",
-        "explicacao": f"Área: {lado1} x {lado2} = {area} m². \nCusto: {area} x {custo} = R$ {total_piso},00."
-    })
+    q4 = {
+        "id": 0, "tema": "Geometria Espacial",
+        "pergunta": f"Um clube recreativo deseja esvaziar sua piscina olímpica para manutenção. A piscina tem formato de paralelepípedo retângulo com {c}m de comprimento, {l}m de largura e {p}m de profundidade. Sabendo que 1m³ equivale a 1.000 litros, qual a capacidade total de água que deverá ser retirada?",
+        "opcoes": [f"{vol_litros} litros", f"{vol_m3} litros", f"{vol_litros/2} litros", f"{vol_litros*10} litros"],
+        "correta": f"{vol_litros} litros",
+        "dica_mestra": "Primeiro calcule o volume em metros cúbicos (C x L x P). Depois multiplique por 1.000 para achar os litros.",
+        "explicacao": f"Volume: {c} x {l} x {p} = {vol_m3} m³. \nEm litros: {vol_m3} x 1.000 = {vol_litros} litros."
+    }
+    random.shuffle(q4['opcoes'])
+    moldes.append(q4)
 
-    # --- SORTEIO ALEATÓRIO ---
-    # Aqui está o segredo: Pegamos 3 moldes aleatórios dessa lista de 6
-    selecionadas = random.sample(moldes, 3)
+    # --- MOLDE 5: PORCENTAGEM (Desconto Loja) ---
+    preco = random.choice([100, 200, 500, 1000])
+    desc = random.choice([10, 20, 25, 50])
+    final = preco - (preco * desc / 100)
     
-    # Arruma os IDs (1, 2, 3)
-    for i, q in enumerate(selecionadas):
-        q['id'] = i + 1
-        
-    return selecionadas
+    q5 = {
+        "id": 0, "tema": "Matemática Financeira",
+        "pergunta": f"Durante a Black Friday, uma loja de eletrônicos anunciou que todos os produtos teriam {desc}% de desconto sobre o preço da etiqueta. Um cliente interessado em um fone de ouvido que custava originalmente R$ {preco},00 decidiu comprá-lo. Quanto ele pagou no caixa?",
+        "opcoes": [f"R$ {final:.2f}", f"R$ {preco-10:.2f}", f"R$ {final+15:.2f}", f"R$ {preco * desc/100:.2f}"],
+        "correta": f"R$ {final:.2f}",
+        "dica_mestra": f"Calcule {desc}% de {preco} e subtraia esse valor do total.",
+        "explicacao": f"Desconto: {preco} x {desc}/100 = {preco*desc/100}. \nPreço Final: {preco} - {preco*desc/100} = R$ {final:.2f}."
+    }
+    random.shuffle(q5['opcoes'])
+    moldes.append(q5)
+
+    # Sorteia 3 questões aleatórias do banco
+    selecao = random.sample(moldes, 3)
+    for i, q in enumerate(selecao): q['id'] = i + 1
+    return selecao
 
 # ==========================================
-# 🤖 GERADOR HÍBRIDO
+# 🤖 GERADOR HÍBRIDO (IA + LOCAL)
 # ==========================================
 def gerar_questoes_agora():
-    # Tenta usar a IA do Google (1 tentativa rápida)
+    # Tenta conectar na IA
     try:
         genai.configure(api_key=minha_chave)
         model = genai.GenerativeModel('models/gemini-flash-latest')
         
         prompt = """
-        Atue como Elaborador do ENEM. Gere JSON com 3 questões DIFÍCEIS e VARIADAS.
-        REGRAS: Texto longo, contexto interdisciplinar.
-        FORMATO: [{"id":1, "tema":"...", "pergunta":"...", "opcoes":["A"], "correta":"A", "dica_mestra":"...", "explicacao":"..."}]
+        Atue como Elaborador do ENEM. Gere JSON com 3 questões.
+        REGRAS RÍGIDAS:
+        1. Contexto: Use situações reais (notícias, cotidiano).
+        2. Aleatoriedade: A resposta correta NÃO pode ser sempre a primeira opção. Misture as posições.
+        3. Formato: [{"id":1, "tema":"...", "pergunta":"...", "opcoes":["A","B"], "correta":"A", "dica_mestra":"...", "explicacao":"..."}]
         """
         response = model.generate_content(prompt)
         texto = response.text.replace("```json", "").replace("```", "").strip()
+        
         if not texto: raise ValueError("Vazio")
         
         dados = json.loads(texto)
-        for i, q in enumerate(dados): q['id'] = i + 1
+        
+        # GARANTIA FINAL: Mesmo que a IA mande ordenado, o Python EMBARALHA TUDO AQUI
+        for q in dados:
+            random.shuffle(q['opcoes'])
+            q['id'] = dados.index(q) + 1
+            
         return dados 
 
     except Exception:
-        # SE A IA FALHAR, USA O NOVO BANCO VARIADO
+        # Se a IA falhar, usa o banco local (que agora também embaralha)
         return gerar_ia_local_variada()
