@@ -10,85 +10,68 @@ try:
 except:
     minha_chave = "COLE_SUA_CHAVE_AQUI"
 
-# ======================================================
-# 🧠 GERADOR 100% IA (COM SISTEMA DE FILA DE ESPERA)
-# ======================================================
-def gerar_questoes_agora():
-    
-    # Configura para ser MUITO CRIATIVO (Temperatura Alta)
-    # Isso garante que a IA nunca repita a mesma questão
-    config_criativa = genai.types.GenerationConfig(
-        temperature=1.0 
-    )
+def buscar_lote_questoes():
+    """
+    Busca um pacote de 5 questões de uma vez para criar um 'estoque'.
+    Isso evita ficar chamando a IA toda hora e travando o site.
+    """
+    try:
+        genai.configure(api_key=minha_chave)
+        
+        # --- A PERSONALIDADE DA SUA IA ---
+        # Aqui definimos que ela é uma Especialista no ENEM
+        config_ia = genai.types.GenerationConfig(
+            temperature=0.8 # Alta criatividade para não repetir
+        )
+        
+        system_instruction = """
+        Você é o 'MathTutor', uma IA especialista em preparar alunos para o ENEM.
+        Seu objetivo é criar questões desafiadoras, interdisciplinares e com pegadinhas inteligentes.
+        Nunca crie perguntas óbvias. Sempre use um texto base.
+        """
 
-    max_tentativas = 6  # Vai insistir 6 vezes antes de desistir
-    tentativa_atual = 0
+        model = genai.GenerativeModel(
+            'models/gemini-flash-latest',
+            generation_config=config_ia,
+            system_instruction=system_instruction
+        )
 
-    while tentativa_atual < max_tentativas:
-        try:
-            print(f"🔄 Tentativa IA: {tentativa_atual + 1}...")
-            genai.configure(api_key=minha_chave)
+        # Pedimos 5 questões de uma vez (Lote)
+        prompt = """
+        Gere um JSON puro com 5 questões de Matemática Estilo ENEM.
+        
+        REGRAS DE OURO:
+        1. **Contexto:** Use temas variados (Astronomia, Economia, Biologia, Cotidiano).
+        2. **Nível:** Médio/Difícil.
+        3. **Estrutura:** Texto base + Pergunta + 4 Alternativas.
+        4. **Feedback:** O campo 'explicacao' deve ser uma aula completa.
+        
+        Formato JSON:
+        [
+            {
+                "tema": "Título do Tema",
+                "pergunta": "Texto longo... Pergunta final?",
+                "opcoes": ["A", "B", "C", "D"],
+                "correta": "A",
+                "dica_mestra": "Dica para desbloquear o raciocínio...",
+                "explicacao": "Passo 1... Passo 2... Conclusão..."
+            }
+        ]
+        """
+        
+        print("⚡ Solicitando lote de questões para a IA...")
+        response = model.generate_content(prompt)
+        texto = response.text.replace("```json", "").replace("```", "").strip()
+        
+        dados = json.loads(texto)
+        
+        # Tratamento final: Embaralha as alternativas de TODAS as questões
+        for q in dados:
+            random.shuffle(q['opcoes'])
             
-            # Usamos o Flash que é mais rápido e gasta menos cota
-            model = genai.GenerativeModel(
-                'models/gemini-flash-latest',
-                generation_config=config_criativa
-            )
-            
-            # PROMPT PODEROSO PARA ENEM
-            prompt = """
-            Você é um Elaborador Sênior do ENEM (Brasil).
-            Gere um JSON com 3 questões de Matemática INÉDITAS.
+        return dados # Retorna a lista com 5 questões
 
-            REGRAS OBRIGATÓRIAS:
-            1. **Criatividade Total:** Crie contextos novos (ex: Biologia, Astronomia, Economia Digital, YouTubers, etc). NÃO use exemplos clichês.
-            2. **Complexidade:** As questões devem exigir interpretação de texto + cálculo.
-            3. **Explicação:** O campo 'explicacao' deve ser uma mini-aula passo a passo.
-            4. **Formato:** JSON Puro.
-
-            MODELO DE RESPOSTA:
-            [
-                {
-                    "id": 1, 
-                    "tema": "Tema Criativo", 
-                    "pergunta": "Texto base longo... Pergunta final?", 
-                    "opcoes": ["A", "B", "C", "D"], 
-                    "correta": "A", 
-                    "explicacao": "Resolução detalhada..."
-                }
-            ]
-            """
-            
-            response = model.generate_content(prompt)
-            texto = response.text.replace("```json", "").replace("```", "").strip()
-            
-            if not texto: raise ValueError("Resposta Vazia")
-            
-            dados = json.loads(texto)
-            
-            # SUCESSO! 
-            # Agora embaralhamos as alternativas para a resposta não ser sempre a primeira
-            for i, q in enumerate(dados):
-                random.shuffle(q['opcoes']) # Mistura A, B, C, D
-                q['id'] = i + 1
-            
-            return dados # Entrega para o site
-
-        except Exception as e:
-            # Se der erro (Google cheio), ele NÃO desiste.
-            # Ele espera um tempo crescente (5s, 10s, 15s...) e tenta de novo.
-            tempo_espera = 5 + (tentativa_atual * 3)
-            print(f"⚠️ Google ocupado. Esperando {tempo_espera} segundos...")
-            time.sleep(tempo_espera) 
-            tentativa_atual += 1
-    
-    # Se falhar 6 vezes (muito raro), mostra aviso para tentar depois.
-    # NÃO mostra questão fake.
-    return [{
-        "id": 1, 
-        "tema": "⚠️ Tráfego Intenso", 
-        "pergunta": "O cérebro da IA está superlotado agora. Por favor, aguarde 30 segundos e clique em gerar novamente.", 
-        "opcoes": ["Entendi"], 
-        "correta": "Entendi", 
-        "explicacao": "Muitas pessoas usando o Google Gemini ao mesmo tempo."
-    }]
+    except Exception as e:
+        print(f"Erro na IA: {e}")
+        # Se der erro, retorna VAZIO (o app.py vai saber lidar com isso)
+        return None
