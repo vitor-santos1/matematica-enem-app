@@ -3,7 +3,6 @@ import json
 import streamlit as st
 import random
 import time
-import math
 
 # --- CONFIGURAÇÃO DA CHAVE ---
 try:
@@ -12,139 +11,119 @@ except:
     minha_chave = "COLE_SUA_CHAVE_AQUI"
 
 # ======================================================
-# 🧠 "IA LOCAL PRO" (QUESTÕES COMPLEXAS E CONTEXTUALIZADAS)
+# 🎲 BANCO DE MOLDES (Sorteia histórias diferentes)
 # ======================================================
-def gerar_ia_local_complexa():
-    questoes = []
-    
-    # --- MODELO 1: GEOMETRIA ESPACIAL + CONVERSÃO DE UNIDADES (Caixa D'água) ---
-    # Complexidade: Volume de cilindro ou prisma + Conversão m³ para Litros + Interpretação
-    raio = random.randint(2, 5)
-    altura = random.randint(3, 8)
-    pi = 3 # O ENEM costuma pedir para usar pi=3
-    volume_m3 = pi * (raio ** 2) * altura
-    volume_litros = volume_m3 * 1000
-    
-    questoes.append({
-        "id": 1,
-        "tema": "Geometria Espacial e Recursos Hídricos",
-        "pergunta": f"""
-        (ENEM Simulado) Em uma região agrícola que sofre com períodos de seca, um agricultor decide construir uma cisterna para armazenamento de água da chuva. 
-        O reservatório terá o formato de um cilindro circular reto com {raio} metros de raio e {altura} metros de altura.
-        
-        O agricultor sabe que, para suprir a necessidade de sua plantação por um mês, ele precisa de exatamente {volume_litros - 5000} litros de água.
-        Considere π = 3.
-        
-        Ao encher a cisterna completamente, a capacidade total em litros será:
-        """,
-        "opcoes": [
-            f"{volume_litros} litros", 
-            f"{volume_m3} litros",  # Pegadinha: Esqueceu de converter pra litros
-            f"{volume_litros/2} litros", 
-            f"{volume_litros * 10} litros"
-        ],
-        "correta": f"{volume_litros} litros",
-        "dica_mestra": "Primeiro calcule o volume do cilindro (Área da base x Altura). Lembre-se que 1 m³ corresponde a 1000 litros.",
-        "explicacao": f"""
-        1. Área da base (Círculo): π . r² = 3 . {raio}² = 3 . {raio*raio} = {3*raio*raio} m².
-        2. Volume (Cilindro): Área da base . Altura = {3*raio*raio} . {altura} = {volume_m3} m³.
-        3. Conversão: 1 m³ = 1000 L. Logo, {volume_m3} x 1000 = {volume_litros} litros.
-        """
+def gerar_ia_local_variada():
+    moldes = []
+
+    # --- MOLDE 1: ANÁLISE COMBINATÓRIA (Senhas) ---
+    chars = random.randint(3, 5)
+    total_senhas = 10 ** chars
+    moldes.append({
+        "id": 0, "tema": "Análise Combinatória",
+        "pergunta": f"Um banco decidiu atualizar seu sistema de segurança e solicitou que todos os clientes criassem novas senhas numéricas formadas por exatamente {chars} algarismos (0 a 9), sendo permitida a repetição de números. Qual o total de senhas possíveis que podem ser criadas nesse novo padrão?",
+        "opcoes": [f"{total_senhas}", f"{total_senhas*10}", f"{10*chars}", f"{9**chars}"],
+        "correta": f"{total_senhas}",
+        "dica_mestra": "Pelo Princípio Fundamental da Contagem, multiplique as possibilidades de cada posição. Temos 10 opções (0-9) para cada vaga.",
+        "explicacao": f"São {chars} posições. Cada uma tem 10 opções. Logo: 10 x 10... ({chars} vezes) = 10^{chars} = {total_senhas}."
     })
 
-    # --- MODELO 2: MATEMÁTICA FINANCEIRA (Juros Compostos vs Simples) ---
-    # Complexidade: Comparação de investimentos, exponencial, interpretação de texto longo.
-    capital = random.choice([1000, 2000, 5000])
-    taxa = 10 # 10% facilita a conta mental mas confunde no composto
-    meses = 2
-    montante_simples = capital + (capital * (taxa/100) * meses)
-    # Juros compostos: Mês 1 = C + 10%. Mês 2 = Novo C + 10%
-    passo1 = capital * 1.10
-    montante_composto = passo1 * 1.10 
-    diferenca = int(montante_composto - montante_simples)
-    
-    questoes.append({
-        "id": 2,
-        "tema": "Matemática Financeira",
-        "pergunta": f"""
-        (ENEM Simulado) Um jovem investidor decide aplicar R$ {capital},00 em um fundo de investimentos arriscado. 
-        Ele tem duas opções de contrato:
-        
-        Opção A: Rendimento de {taxa}% ao mês em regime de juros simples.
-        Opção B: Rendimento de {taxa}% ao mês em regime de juros compostos.
-        
-        O investidor deixará o dinheiro aplicado por exatamente {meses} meses.
-        Ao final desse período, qual será a diferença, em reais, entre o ganho da Opção B em relação à Opção A?
-        """,
-        "opcoes": [
-            f"R$ {diferenca},00", 
-            f"R$ 0,00", # Pegadinha: Achar que é igual
-            f"R$ {int(capital * 0.1)},00", 
-            f"R$ {diferenca * 10},00"
-        ],
-        "correta": f"R$ {diferenca},00",
-        "dica_mestra": "Calcule os dois cenários separadamente. No juro composto, o rendimento do segundo mês incide sobre o total acumulado no primeiro mês (juro sobre juro).",
-        "explicacao": f"""
-        Opção A (Simples): Rende fixo {int(capital*0.1)} por mês. Em 2 meses: {int(capital*0.2)}. Total: R$ {int(montante_simples)}.
-        Opção B (Composto): 
-        - Mês 1: {capital} + 10% = {int(passo1)}.
-        - Mês 2: {int(passo1)} + 10% = {int(montante_composto)}.
-        Diferença: {int(montante_composto)} - {int(montante_simples)} = R$ {diferenca},00.
-        """
+    # --- MOLDE 2: ESCALA (Mapas) ---
+    escala_cm = random.choice([100, 200, 500, 1000]) # 1:100 etc
+    dist_mapa = random.randint(5, 20) # cm
+    dist_real_cm = dist_mapa * escala_cm
+    dist_real_m = dist_real_cm / 100
+    moldes.append({
+        "id": 0, "tema": "Razão e Proporção (Escala)",
+        "pergunta": f"Em um mapa arquitetônico desenhado na escala 1:{escala_cm}, a medida do comprimento de uma sala é de {dist_mapa} cm. Qual é a medida real, em metros, desse comprimento?",
+        "opcoes": [f"{dist_real_m} m", f"{dist_real_cm} m", f"{dist_real_m/10} m", f"{dist_real_m*10} m"],
+        "correta": f"{dist_real_m} m",
+        "dica_mestra": f"A escala 1:{escala_cm} significa que 1 cm no papel vale {escala_cm} cm na vida real. Converta para metros no final.",
+        "explicacao": f"1. Distância em cm: {dist_mapa} x {escala_cm} = {dist_real_cm} cm. \n2. Converter para metros (dividir por 100): {dist_real_m} metros."
     })
 
-    # --- MODELO 3: FUNÇÃO DE 1º GRAU (Uber/Táxi) ---
-    # Complexidade: Modelagem de função afim f(x) = ax + b
-    bandeirada = random.randint(4, 10)
-    preco_km = random.choice([2, 3, 4, 5])
-    distancia_viagem = random.randint(10, 30)
-    total_pagar = bandeirada + (preco_km * distancia_viagem)
-    
-    questoes.append({
-        "id": 3,
-        "tema": "Funções e Cotidiano",
-        "pergunta": f"""
-        (ENEM Simulado) Em uma cidade turística, o serviço de transporte por aplicativo cobra uma tarifa fixa chamada de 'bandeirada' no valor de R$ {bandeirada},00, somada a R$ {preco_km},00 por quilômetro rodado.
-        
-        Um grupo de amigos solicitou um carro para ir de um hotel até o aeroporto, percorrendo uma distância total de {distancia_viagem} km.
-        Considerando que não houve cobrança por tempo de espera, o valor final da corrida foi dada pela função f(x) = {preco_km}x + {bandeirada}.
-        
-        Quanto o grupo pagou?
-        """,
-        "opcoes": [
-            f"R$ {total_pagar},00", 
-            f"R$ {bandeirada + distancia_viagem},00", 
-            f"R$ {preco_km * distancia_viagem},00", # Esqueceu a bandeirada
-            f"R$ {total_pagar + 10},00"
-        ],
-        "correta": f"R$ {total_pagar},00",
-        "dica_mestra": "Monte a função: Preço Final = Preço Fixo + (Preço por Km vezes a Distância).",
-        "explicacao": f"""
-        A função é f(x) = ax + b, onde 'a' é o preço variável ({preco_km}) e 'b' é o fixo ({bandeirada}).
-        Calculando para x = {distancia_viagem} km:
-        f({distancia_viagem}) = ({preco_km} * {distancia_viagem}) + {bandeirada}
-        f({distancia_viagem}) = {preco_km * distancia_viagem} + {bandeirada}
-        Total = R$ {total_pagar},00.
-        """
+    # --- MOLDE 3: ESTATÍSTICA (Média de Gols/Notas) ---
+    valores = [random.randint(0, 5) for _ in range(5)]
+    soma = sum(valores)
+    media = soma / 5
+    moldes.append({
+        "id": 0, "tema": "Estatística (Média)",
+        "pergunta": f"Um time de futebol marcou a seguinte quantidade de gols nos seus últimos 5 jogos: {valores}. Qual foi a média de gols por partida desse time?",
+        "opcoes": [f"{media:.1f}", f"{media+1:.1f}", f"{soma}", f"{media/2:.1f}"],
+        "correta": f"{media:.1f}",
+        "dica_mestra": "Para calcular a Média Aritmética Simples, some todos os valores e divida pela quantidade de jogos (5).",
+        "explicacao": f"Soma: {valores[0]}+{valores[1]}+{valores[2]}+{valores[3]}+{valores[4]} = {soma}. \nMédia: {soma} ÷ 5 = {media:.1f}."
     })
 
-    return questoes
+    # --- MOLDE 4: PROBABILIDADE (Urna) ---
+    vermelhas = random.randint(3, 10)
+    azuis = random.randint(3, 10)
+    total = vermelhas + azuis
+    prob_azul_pct = int((azuis / total) * 100)
+    moldes.append({
+        "id": 0, "tema": "Probabilidade",
+        "pergunta": f"Em uma urna opaca existem {vermelhas} bolas vermelhas e {azuis} bolas azuis, todas idênticas ao tato. Ao retirar uma bola ao acaso, qual a probabilidade aproximada (em porcentagem) de ela ser AZUL?",
+        "opcoes": [f"{prob_azul_pct}%", f"{100 - prob_azul_pct}%", "50%", f"{int(prob_azul_pct/2)}%"],
+        "correta": f"{prob_azul_pct}%",
+        "dica_mestra": "Probabilidade = (Casos Favoráveis / Casos Totais). Multiplique por 100 para achar a porcentagem.",
+        "explicacao": f"Total de bolas: {total}. Bolas azuis: {azuis}. \nCálculo: {azuis}/{total} = {azuis/total:.2f} = {prob_azul_pct}%."
+    })
 
+    # --- MOLDE 5: FUNÇÃO DE 1º GRAU (Salário Vendedor) ---
+    fixo = random.choice([1000, 1200, 1500])
+    comissao = random.choice([20, 50, 100])
+    vendas = random.randint(5, 15)
+    salario = fixo + (comissao * vendas)
+    moldes.append({
+        "id": 0, "tema": "Funções (Salário)",
+        "pergunta": f"Um vendedor recebe um salário mensal fixo de R$ {fixo},00 mais uma comissão de R$ {comissao},00 por produto vendido. Em um mês onde ele vendeu {vendas} produtos, qual foi seu salário total?",
+        "opcoes": [f"R$ {salario},00", f"R$ {fixo + vendas},00", f"R$ {comissao * vendas},00", f"R$ {salario + 200},00"],
+        "correta": f"R$ {salario},00",
+        "dica_mestra": "A função é Salário = Fixo + (Comissão x Quantidade).",
+        "explicacao": f"Conta: {fixo} + ({comissao} x {vendas}) \n= {fixo} + {comissao*vendas} \n= R$ {salario},00."
+    })
+    
+    # --- MOLDE 6: GEOMETRIA (Área Piso) ---
+    lado1 = random.randint(3, 8)
+    lado2 = random.randint(4, 10)
+    area = lado1 * lado2
+    custo = random.randint(20, 60)
+    total_piso = area * custo
+    moldes.append({
+        "id": 0, "tema": "Geometria e Orçamento",
+        "pergunta": f"Deseja-se trocar o piso de uma sala retangular de {lado1}m por {lado2}m. O pedreiro cobra R$ {custo},00 por metro quadrado (m²) instalado. Qual será o custo total da mão de obra?",
+        "opcoes": [f"R$ {total_piso},00", f"R$ {area * 10},00", f"R$ {total_piso/2},00", f"R$ {custo * 10},00"],
+        "correta": f"R$ {total_piso},00",
+        "dica_mestra": "Calcule a área da sala (Base x Altura) e multiplique pelo preço do m².",
+        "explicacao": f"Área: {lado1} x {lado2} = {area} m². \nCusto: {area} x {custo} = R$ {total_piso},00."
+    })
+
+    # --- SORTEIO ALEATÓRIO ---
+    # Aqui está o segredo: Pegamos 3 moldes aleatórios dessa lista de 6
+    selecionadas = random.sample(moldes, 3)
+    
+    # Arruma os IDs (1, 2, 3)
+    for i, q in enumerate(selecionadas):
+        q['id'] = i + 1
+        
+    return selecionadas
+
+# ==========================================
+# 🤖 GERADOR HÍBRIDO
+# ==========================================
 def gerar_questoes_agora():
-    # Tenta usar a IA do Google primeiro (apenas 1 tentativa rápida)
+    # Tenta usar a IA do Google (1 tentativa rápida)
     try:
         genai.configure(api_key=minha_chave)
         model = genai.GenerativeModel('models/gemini-flash-latest')
         
-        # Timeout curto: se o Google demorar, já pula pro Local Complexo
         prompt = """
-        Atue como Elaborador do ENEM. Gere JSON com 3 questões DIFÍCEIS.
-        REGRAS: Texto longo, contexto interdisciplinar, pegadinhas.
+        Atue como Elaborador do ENEM. Gere JSON com 3 questões DIFÍCEIS e VARIADAS.
+        REGRAS: Texto longo, contexto interdisciplinar.
         FORMATO: [{"id":1, "tema":"...", "pergunta":"...", "opcoes":["A"], "correta":"A", "dica_mestra":"...", "explicacao":"..."}]
         """
         response = model.generate_content(prompt)
         texto = response.text.replace("```json", "").replace("```", "").strip()
-        
         if not texto: raise ValueError("Vazio")
         
         dados = json.loads(texto)
@@ -152,6 +131,5 @@ def gerar_questoes_agora():
         return dados 
 
     except Exception:
-        # SE DER QUALQUER ERRO, USA O GERADOR LOCAL NÍVEL HARD
-        # Ela não vai notar a diferença porque as questões são muito bem montadas.
-        return gerar_ia_local_complexa()
+        # SE A IA FALHAR, USA O NOVO BANCO VARIADO
+        return gerar_ia_local_variada()
