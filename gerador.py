@@ -2,21 +2,17 @@ import random
 import math
 
 # ==============================================================================
-# 🧠 VITOR-AI: MOTOR DE GERAÇÃO PROCEDURAL (SEM INTERNET)
+# 🧠 VITOR-AI 2.0: GERADOR PROCEDURAL DIVERSIFICADO
 # ==============================================================================
-# Esta "IA" constrói questões frase por frase usando bancos de dados semânticos.
-# Resultado: Questões infinitas, complexas e sempre diferentes.
 
 def get_texto(tipo):
     """Banco de dados criativo para montar frases dinâmicas."""
     db = {
-        "cientistas": ["Um engenheiro nuclear", "Uma bióloga marinha", "Um pesquisador da USP", "Um químico industrial", "Um geólogo"],
-        "locais": ["em um laboratório de alta tecnologia", "em uma expedição na Antártida", "durante uma análise de campo", "no centro de controle"],
-        "verbos_crescimento": ["observou um crescimento acelerado", "notou uma multiplicação exponencial", "registrou um aumento progressivo"],
-        "verbos_queda": ["detectou um decaimento radioativo", "mediu a desvalorização do ativo", "analisou a redução da concentração"],
-        "microorganismos": ["de uma colônia de bactérias", "de uma cultura de vírus", "de algas microscópicas", "de células-tronco"],
-        "elementos_quimicos": ["do Isótopo Césio-137", "de uma amostra de Urânio", "de um composto instável", "de Carbono-14"],
-        "conectivos_dica": ["Lembre-se que", "Note que", "Considere o fato de que", "Atenção à regra:"],
+        "profissoes": ["Um engenheiro civil", "Uma arquiteta", "Um mestre de obras", "Um analista de dados", "Um gerente de projetos"],
+        "locais": ["no canteiro de obras", "em um projeto urbano", "na análise trimestral", "no planejamento estratégico"],
+        "verbos": ["precisa calcular", "está projetando", "analisou os dados de", "deve estimar"],
+        "estruturas": ["uma rampa de acessibilidade", "uma escada de segurança", "o telhado de um galpão", "uma torre de transmissão"],
+        "conectivos": ["Sabendo que", "Considerando que", "Tendo em vista que", "De acordo com as normas,"],
     }
     return random.choice(db[tipo])
 
@@ -24,112 +20,136 @@ def gerar_ia_propria():
     questoes = []
 
     # ------------------------------------------------------------------
-    # MOTOR 1: FUNÇÃO EXPONENCIAL (Crescimento/Decaimento)
+    # MOTOR 1: TRIGONOMETRIA / PITÁGORAS (Construção Civil)
     # ------------------------------------------------------------------
-    # A IA decide na hora se é uma questão de Biologia (Crescer) ou Física (Cair)
-    modo = random.choice(["biologia", "fisica"])
+    # Usa Trios Pitagóricos para dar conta exata: (3,4,5), (6,8,10), (5,12,13)
+    trio = random.choice([(3,4,5), (6,8,10), (5,12,13), (8,15,17)])
+    cateto1, cateto2, hipotenusa = trio
     
-    if modo == "biologia":
-        sujeito = get_texto("cientistas")
-        local = get_texto("locais")
-        verbo = get_texto("verbos_crescimento")
-        objeto = get_texto("microorganismos")
-        
-        inicial = random.choice([100, 200, 500, 1000])
-        tempo = random.randint(3, 8) # horas
-        base = 2 # dobra
-        final = inicial * (base ** tempo)
-        
-        pergunta = f"{sujeito}, trabalhando {local}, {verbo} {objeto}. No início do experimento, haviam exatos {inicial} organismos. Sabendo que essa população dobra a cada hora, qual será a quantidade total após {tempo} horas?"
-        dica = f"{get_texto('conectivos_dica')} uma duplicação a cada hora é uma Função Exponencial de base 2."
-        expl = f"Fórmula: N(t) = N0 . 2^t\nCálculo: {inicial} . 2^{tempo} = {inicial} . {2**tempo} = {final} organismos."
+    # Contexto: Escada ou Rampa
+    sujeito = get_texto("profissoes")
+    estrutura = get_texto("estruturas")
     
-    else: # Fisica (Radioatividade)
-        sujeito = get_texto("cientistas")
-        objeto = get_texto("elementos_quimicos")
-        verbo = get_texto("verbos_queda")
-        
-        inicial = random.choice([100, 80, 64, 128]) # gramas
-        meia_vida = random.randint(10, 30) # anos
-        ciclos = random.randint(2, 4)
-        tempo_total = meia_vida * ciclos
-        final = inicial / (2 ** ciclos)
-        
-        pergunta = f"{sujeito} {verbo} {objeto}. A amostra inicial tinha {inicial}g. Sabendo que a meia-vida desse material é de {meia_vida} anos, qual será a massa restante após {tempo_total} anos?"
-        dica = f"{get_texto('conectivos_dica')} a cada 'meia-vida', a massa é dividida por 2."
-        expl = f"Tempo passado: {tempo_total} anos. Isso equivale a {ciclos} meias-vidas ({tempo_total}/{meia_vida}).\nCálculo: {inicial} dividido por 2, {ciclos} vezes = {final}g."
+    if random.choice(["escada", "sombra"]):
+        pergunta = f"{sujeito} {get_texto('verbos')} o comprimento de {estrutura}. A base da estrutura está apoiada no chão a {cateto1} metros de distância da parede, e o topo atinge uma altura de {cateto2} metros. Qual deve ser o comprimento total dessa estrutura (hipotenusa)?"
+        dica = "Isso forma um Triângulo Retângulo. Use o Teorema de Pitágoras: a² = b² + c²."
+        expl = f"Cateto 1 (b) = {cateto1}m. Cateto 2 (c) = {cateto2}m.\nHipotenusa² = {cateto1}² + {cateto2}²\nH² = {cateto1*cateto1} + {cateto2*cateto2} = {hipotenusa*hipotenusa}\nH = Raiz de {hipotenusa*hipotenusa} = {hipotenusa} metros."
+        resp = f"{hipotenusa} metros"
+    else:
+        pergunta = f"Durante uma reforma, {sujeito} instalou uma viga de {hipotenusa} metros na diagonal. Se a altura da parede é de {cateto2} metros, a que distância da parede a viga foi fixada no chão?"
+        dica = "Você tem a Hipotenusa e um Cateto. Use Pitágoras para achar o outro lado."
+        expl = f"Hipotenusa = {hipotenusa}. Cateto Conhecido = {cateto2}.\n{hipotenusa}² = {cateto2}² + x²\n{hipotenusa*hipotenusa} = {cateto2*cateto2} + x²\nx² = {hipotenusa*hipotenusa} - {cateto2*cateto2} = {cateto1*cateto1}\nx = {cateto1} metros."
+        resp = f"{cateto1} metros"
 
-    q1 = {
-        "id": 1, "tema": f"Função Exponencial ({modo.capitalize()})",
+    q_trig = {
+        "id": 1, "tema": "Geometria (Teorema de Pitágoras)",
         "pergunta": pergunta,
-        "opcoes": [f"{final}", f"{final*2}", f"{inicial}", f"{final/2}"],
-        "correta": f"{final}", "dica_mestra": dica, "explicacao": expl
+        "opcoes": [resp, f"{hipotenusa + 2} metros", f"{cateto1 + cateto2} metros", f"{int((cateto1+cateto2)/2)} metros"],
+        "correta": resp, "dica_mestra": dica, "explicacao": expl
     }
-    random.shuffle(q1['opcoes'])
-    questoes.append(q1)
+    random.shuffle(q_trig['opcoes'])
+    questoes.append(q_trig)
 
     # ------------------------------------------------------------------
-    # MOTOR 2: MATEMÁTICA FINANCEIRA (Histórias de Fraude/Lucro)
+    # MOTOR 2: ESTATÍSTICA (Média e Moda)
     # ------------------------------------------------------------------
-    # Contexto: Investimento ou Dívida
-    tipo_fin = random.choice(["investimento", "divida"])
-    capital = random.choice([1000, 2000, 5000, 10000])
-    taxa = random.choice([5, 10, 20])
-    meses = 2
+    # Gera uma lista de números aleatórios (ex: notas, gols, idades)
+    lista = [random.randint(1, 10) for _ in range(5)]
+    # Garante que tenha uma moda (um número que repete)
+    repetido = random.choice(lista)
+    lista.append(repetido)
+    random.shuffle(lista)
     
-    if tipo_fin == "investimento":
-        contexto = f"Um jovem empreendedor decidiu aplicar R$ {capital},00 em uma startup de tecnologia."
-        acao = "O contrato prometia um retorno de"
-        final_simples = capital + (capital * (taxa/100) * meses)
-        # Juros compostos simulados na mao
-        m1 = capital * (1 + taxa/100)
-        m2 = m1 * (1 + taxa/100)
-        final_composto = int(m2)
-        pergunta_fim = f"Se o regime for de Juros Compostos, qual o montante após {meses} meses?"
-        
-    else: # Divida
-        contexto = f"Devido a um imprevisto médico, uma família precisou pegar um empréstimo de R$ {capital},00 no banco."
-        acao = "A taxa cobrada pelo banco foi de"
-        m1 = capital * (1 + taxa/100)
-        m2 = m1 * (1 + taxa/100)
-        final_composto = int(m2)
-        pergunta_fim = f"Considerando Juros Compostos, qual o valor total da dívida após {meses} meses?"
-
-    q2 = {
-        "id": 2, "tema": "Matemática Financeira",
-        "pergunta": f"{contexto} {acao} {taxa}% ao mês. {pergunta_fim}",
-        "opcoes": [f"R$ {final_composto},00", f"R$ {capital},00", f"R$ {int(capital * 2)},00", f"R$ {int(final_composto * 1.5)},00"],
-        "correta": f"R$ {final_composto},00",
-        "dica_mestra": "Juros Compostos é 'Juro sobre Juro'. Calcule mês a mês.",
-        "explicacao": f"Mês 1: {capital} + {taxa}% = {int(m1)}. \nMês 2: {int(m1)} + {taxa}% = {final_composto}."
-    }
-    random.shuffle(q2['opcoes'])
-    questoes.append(q2)
-
-    # ------------------------------------------------------------------
-    # MOTOR 3: ANÁLISE COMBINATÓRIA (Situações de Risco)
-    # ------------------------------------------------------------------
-    # Contexto: Senhas ou Cofres
-    digitos = random.randint(3, 5)
-    total = 10 ** digitos
-    cenario = random.choice([
-        f"O cofre de segurança máxima de um banco possui uma senha digital de {digitos} dígitos.",
-        f"Para desbloquear um smartphone apreendido, a perícia precisa descobrir um código de {digitos} dígitos."
-    ])
+    soma = sum(lista)
+    media = soma / len(lista)
+    lista_str = ", ".join(map(str, lista))
     
-    q3 = {
-        "id": 3, "tema": "Análise Combinatória",
-        "pergunta": f"{cenario} Sabendo que os dígitos podem ser quaisquer números de 0 a 9 e que podem se repetir, quantas tentativas no máximo seriam necessárias para descobrir o código na força bruta?",
-        "opcoes": [f"{total}", f"{10*digitos}", f"{9**digitos}", f"{total*10}"],
-        "correta": f"{total}",
-        "dica_mestra": "Princípio Fundamental da Contagem: 10 opções para a primeira casa, 10 para a segunda...",
-        "explicacao": f"Temos {digitos} posições. Cada uma tem 10 possibilidades.\nConta: 10 elevado a {digitos} = {total} combinações."
+    contexto_stat = random.choice(["as notas de um aluno", "o número de vendas diárias", "os gols marcados no campeonato"])
+    
+    q_stat = {
+        "id": 2, "tema": "Estatística Básica",
+        "pergunta": f"Um analista registrou {contexto_stat} nos últimos 6 eventos: {{ {lista_str} }}. Qual é, respectivamente, a Média Aritmética e a Moda desse conjunto de dados?",
+        "opcoes": [
+            f"Média {media:.1f} e Moda {repetido}", 
+            f"Média {media+1:.1f} e Moda {repetido}", 
+            f"Média {repetido} e Moda {media:.1f}", 
+            f"Média {soma} e Moda {repetido}"
+        ],
+        "correta": f"Média {media:.1f} e Moda {repetido}",
+        "dica_mestra": "Média = Soma tudo e divide pela quantidade. Moda = O número que mais aparece.",
+        "explicacao": f"1. Soma: {soma}. Quantidade: 6. Média = {soma}/6 = {media:.1f}.\n2. O número que mais se repete na lista é {repetido} (Moda)."
     }
-    random.shuffle(q3['opcoes'])
-    questoes.append(q3)
+    random.shuffle(q_stat['opcoes'])
+    questoes.append(q_stat)
+
+    # ------------------------------------------------------------------
+    # MOTOR 3: PROGRESSÃO ARITMÉTICA (Metas e Treinos)
+    # ------------------------------------------------------------------
+    # An = A1 + (n-1)r
+    a1 = random.choice([5, 10, 100, 500]) # Começo
+    razao = random.randint(2, 50) # Aumento diário
+    n = random.randint(5, 20) # Dias/Meses
+    an = a1 + (n - 1) * razao
+    
+    tipo_pa = random.choice(["treino", "economia"])
+    if tipo_pa == "treino":
+        texto_pa = f"Um atleta correu {a1} km no primeiro dia de treino e decidiu aumentar sua meta em {razao} km todos os dias."
+        pergunta_pa = f"Seguindo esse cronograma, quantos quilômetros ele correrá exatamente no {n}º dia?"
+    else:
+        texto_pa = f"Para comprar um carro, João guardou R$ {a1},00 no primeiro mês e decidiu aumentar o depósito em R$ {razao},00 a cada mês subsequente."
+        pergunta_pa = f"Qual será o valor depositado no {n}º mês?"
+
+    q_pa = {
+        "id": 3, "tema": "Progressão Aritmética (PA)",
+        "pergunta": f"{texto_pa} {pergunta_pa}",
+        "opcoes": [f"{an}", f"{an + razao}", f"{a1 * n}", f"{an - 10}"],
+        "correta": f"{an}",
+        "dica_mestra": "Use a fórmula do Termo Geral da PA: An = A1 + (n-1).r",
+        "explicacao": f"Dados: A1={a1}, Razão(r)={razao}, n={n}.\nCálculo: An = {a1} + ({n}-1)x{razao}\nAn = {a1} + {n-1}x{razao}\nAn = {a1} + {(n-1)*razao} = {an}."
+    }
+    random.shuffle(q_pa['opcoes'])
+    questoes.append(q_pa)
+
+    # ------------------------------------------------------------------
+    # MOTOR 4: FUNÇÃO DE 1º GRAU (Uber / Táxi)
+    # ------------------------------------------------------------------
+    # f(x) = ax + b
+    bandeirada = random.choice([4.00, 5.50, 6.00, 10.00])
+    km_rodado = random.choice([2.50, 3.00, 4.00])
+    distancia = random.randint(8, 25)
+    total = bandeirada + (km_rodado * distancia)
+    
+    q_fun = {
+        "id": 4, "tema": "Função Afim (1º Grau)",
+        "pergunta": f"Em uma cidade, o serviço de táxi cobra um valor fixo de R$ {bandeirada:.2f} (bandeirada) mais R$ {km_rodado:.2f} por quilômetro rodado. Um passageiro solicitou uma corrida de {distancia} km. Qual o valor final a pagar?",
+        "opcoes": [f"R$ {total:.2f}", f"R$ {bandeirada + distancia:.2f}", f"R$ {km_rodado * distancia:.2f}", f"R$ {total+5:.2f}"],
+        "correta": f"R$ {total:.2f}",
+        "dica_mestra": "Monte a função: Preço = Fixo + (Preço_Km x Distância).",
+        "explicacao": f"Função: f(x) = {km_rodado}x + {bandeirada}.\nSubstituindo x por {distancia}: ({km_rodado} * {distancia}) + {bandeirada} = {km_rodado*distancia} + {bandeirada} = R$ {total:.2f}."
+    }
+    random.shuffle(q_fun['opcoes'])
+    questoes.append(q_fun)
+
+    # ------------------------------------------------------------------
+    # MOTOR 5: PROBABILIDADE (Urnas e Sorteios)
+    # ------------------------------------------------------------------
+    vencedores = random.randint(1, 5)
+    total_participantes = random.choice([50, 100, 200, 500])
+    # Simplificando a fração se possível (didático)
+    prob_pct = (vencedores / total_participantes) * 100
+    
+    q_prob = {
+        "id": 5, "tema": "Probabilidade",
+        "pergunta": f"Em uma rifa beneficente, foram vendidos {total_participantes} bilhetes numerados. João comprou {vencedores} bilhetes. Supondo que o sorteio seja honesto, qual a probabilidade (em porcentagem) de João ganhar o prêmio?",
+        "opcoes": [f"{prob_pct:.1f}%", f"{prob_pct*2:.1f}%", f"{100-prob_pct:.1f}%", "50.0%"],
+        "correta": f"{prob_pct:.1f}%",
+        "dica_mestra": "Probabilidade = (O que eu quero) dividido pelo (Total Possível). Depois multiplique por 100.",
+        "explicacao": f"Favoráveis: {vencedores}. Total: {total_participantes}.\nDivisão: {vencedores} ÷ {total_participantes} = {vencedores/total_participantes}.\nEm porcentagem: {vencedores/total_participantes} x 100 = {prob_pct:.1f}%."
+    }
+    random.shuffle(q_prob['opcoes'])
+    questoes.append(q_prob)
 
     return questoes
 
-# Função que o app.py vai chamar (Nome deve ser igual ao do app.py)
 def gerar_questoes_agora():
     return gerar_ia_propria()
