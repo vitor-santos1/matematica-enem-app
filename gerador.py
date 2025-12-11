@@ -1,170 +1,152 @@
+import google.generativeai as genai
+import json
+import streamlit as st
 import random
+import time
 import math
 
-# ==========================================
-# 🧠 CÉREBRO DA IA SIMBÓLICA (Vitor-AI)
-# ==========================================
-# Esta IA não usa internet. Ela constrói conhecimento matematicamente.
+# --- CONFIGURAÇÃO DA CHAVE ---
+try:
+    minha_chave = st.secrets["GOOGLE_API_KEY"]
+except:
+    minha_chave = "COLE_SUA_CHAVE_AQUI"
 
-def get_elemento(categoria):
-    """Banco de dados criativo da IA para montar histórias."""
-    db = {
-        "pessoas": ["Ana", "Carlos", "Beatriz", "João", "Fernanda", "Rafael", "Mariana", "Lucas", "O gerente", "A engenheira"],
-        "lugares": ["no shopping", "na construção civil", "no laboratório", "na bolsa de valores", "no supermercado", "na fazenda"],
-        "objetos_caros": ["um notebook gamer", "uma geladeira smart", "um carro popular", "um drone profissional", "um smartphone"],
-        "eventos": ["na Black Friday", "no Natal", "na liquidação de estoque", "durante a crise", "na alta do dólar"],
-        "construcoes": ["uma piscina olímpica", "um reservatório de água", "um silo de grãos", "uma caixa d'água", "um tanque de combustível"]
-    }
-    return random.choice(db[categoria])
+# ==============================================================================
+# ☢️ MOTOR DE COMPLEXIDADE (FALLBACK CIENTÍFICO)
+# ==============================================================================
+# Este motor gera questões de alto nível (Logaritmo, Exponencial, Combinatória)
+# Ele entra em ação apenas se a IA do Google estiver travada.
 
-def gerar_ia_simbolica():
+def gerar_complexidade_cientifica():
     questoes = []
+
+    # --- TEMA 1: FUNÇÃO EXPONENCIAL (Crescimento de Bactérias / Meia-Vida) ---
+    tipo = random.choice(["bacterias", "radioativo"])
     
-    # ------------------------------------------------------------------
-    # MOTOR 1: MATEMÁTICA FINANCEIRA (Histórias de Compras)
-    # ------------------------------------------------------------------
-    pessoa = get_elemento("pessoas")
-    objeto = get_elemento("objetos_caros")
-    evento = get_elemento("eventos")
-    
-    preco_base = random.choice([1200, 2500, 3000, 4500, 5000])
-    desconto = random.choice([10, 15, 20, 25, 30, 50])
-    
-    valor_desconto = preco_base * (desconto / 100)
-    valor_final = preco_base - valor_desconto
-    
+    if tipo == "bacterias":
+        inicial = random.choice([100, 200, 500])
+        taxa = 2 # Dobra
+        tempo_h = random.randint(3, 6)
+        final = inicial * (taxa ** tempo_h)
+        texto_base = f"Em um experimento biológico controlado, uma cultura de bactérias se reproduz de forma binária, duplicando sua população a cada hora. No início do experimento (t=0), haviam {inicial} microrganismos."
+        pergunta = f"{texto_base} Considerando que as condições de temperatura e nutrientes permaneceram ideais, qual será a população exata de bactérias após {tempo_h} horas?"
+        expl = f"Função Exponencial: N(t) = N0 . 2^t. \nCálculo: {inicial} . 2^{tempo_h} = {inicial} . {2**tempo_h} = {final}."
+        
+    else: # Radioativo
+        inicial = random.choice([100, 80, 64]) # Gramas
+        meia_vida = random.randint(10, 30) # Anos
+        ciclos = random.randint(2, 4)
+        tempo_passado = meia_vida * ciclos
+        final = inicial / (2 ** ciclos)
+        texto_base = f"O Césio-137 é um isótopo radioativo cuja meia-vida é de aproximadamente {meia_vida} anos. Uma amostra isolada continha inicialmente {inicial}g desse material."
+        pergunta = f"{texto_base} Passados exatos {tempo_passado} anos, qual a massa restante de material radioativo nessa amostra?"
+        expl = f"Meia-vida significa que a massa cai pela metade a cada ciclo. \nTempo passado: {tempo_passado} anos = {ciclos} meias-vidas. \nCálculo: {inicial} dividido por 2, {ciclos} vezes = {final}g."
+
     q1 = {
-        "id": 1,
-        "tema": "Matemática Financeira",
-        "pergunta": f"{evento}, {pessoa} encontrou {objeto} que custava originalmente R$ {preco_base},00. A loja anunciou um desconto imperdível de {desconto}% para pagamento à vista. Interessado na oferta, {pessoa} decidiu fechar negócio. Qual foi o valor final pago?",
-        "opcoes": [
-            f"R$ {valor_final:.2f}", 
-            f"R$ {valor_final + 100:.2f}", 
-            f"R$ {preco_base - 100:.2f}", 
-            f"R$ {valor_desconto:.2f}"
-        ],
-        "correta": f"R$ {valor_final:.2f}",
-        "dica_mestra": f"A palavra 'desconto' significa subtrair. Calcule {desconto}% de {preco_base} e tire esse valor do total.",
-        "explicacao": f"1. Cálculo do desconto: {preco_base} x {desconto}/100 = R$ {valor_desconto:.2f}.\n2. Valor Final: {preco_base} - {valor_desconto} = R$ {valor_final:.2f}."
+        "id": 1, "tema": "Função Exponencial e Biologia/Física",
+        "pergunta": pergunta,
+        "opcoes": [f"{final}", f"{final*2}", f"{final/2}", f"{inicial + tempo_h if tipo=='bacterias' else inicial - ciclos}"],
+        "correta": f"{final}",
+        "explicacao": expl
     }
     random.shuffle(q1['opcoes'])
     questoes.append(q1)
 
-    # ------------------------------------------------------------------
-    # MOTOR 2: GEOMETRIA ESPACIAL (Engenharia e Volume)
-    # ------------------------------------------------------------------
-    construcao = get_elemento("construcoes")
-    raio = random.randint(3, 10)
-    altura = random.randint(2, 6)
-    pi = 3
-    
-    # Volume Cilindro = pi * r² * h
-    vol_m3 = pi * (raio ** 2) * altura
-    vol_litros = vol_m3 * 1000
-    
+    # --- TEMA 2: LOGARITMOS (Terremotos / pH Químico) ---
+    if random.choice([True, False]):
+        # Escala Richter
+        energia_base = 1000
+        fator = random.randint(4, 8) # Potência de 10
+        energia_real = energia_base * (10**fator)
+        magnitude = math.log10(energia_real) - math.log10(energia_base) # Simplificado M = log(E)
+        # Vamos usar a fórmula M = log10(Energia) para simplificar didaticamente
+        magnitude_real = fator
+        
+        pergunta = f"A magnitude M de um terremoto na escala Richter pode ser calculada pelo logaritmo decimal da energia liberada E (em joules), dada pela fórmula simplificada M = log(E). Se um terremoto liberou uma energia de 10^{magnitude_real} Joules, qual foi sua magnitude?"
+        res = f"{magnitude_real}"
+        expl = f"Propriedade dos Logaritmos: log(10^x) = x. \nSe a energia é 10^{magnitude_real}, então log(10^{magnitude_real}) = {magnitude_real}."
+    else:
+        # pH Químico
+        concentracao = random.choice([2, 3, 4, 5]) # 10^-x
+        ph = concentracao
+        pergunta = f"O potencial hidrogeniônico (pH) de uma solução é dado pela fórmula pH = -log[H+], onde [H+] é a concentração de íons de hidrogênio em mol/L. Uma análise em laboratório indicou que uma amostra de chuva ácida possui [H+] = 10^(-{ph}) mol/L. Qual o pH dessa chuva?"
+        res = f"{ph}"
+        expl = f"Fórmula: pH = -log(10^-{ph}). \nPela propriedade de logaritmos: log(10^x) = x. \nLogo: -(-{ph}) = {ph}."
+
     q2 = {
-        "id": 2,
-        "tema": "Geometria Espacial",
-        "pergunta": f"Um projeto de engenharia prevê a instalação de {construcao} em formato cilíndrico para abastecer uma comunidade. As medidas do projeto indicam raio da base de {raio} metros e altura de {altura} metros. Considerando π = 3, qual a capacidade total de armazenamento em litros?",
-        "opcoes": [
-            f"{vol_litros} litros", 
-            f"{vol_m3} litros", 
-            f"{vol_litros/2} litros", 
-            f"{vol_litros * 10} litros"
-        ],
-        "correta": f"{vol_litros} litros",
-        "dica_mestra": "Primeiro calcule o volume em m³ (Área da Base x Altura). Lembre-se que 1 m³ = 1000 Litros.",
-        "explicacao": f"1. Área da base (π.r²): 3 x {raio}² = {3 * raio**2} m².\n2. Volume (Base x Altura): {3 * raio**2} x {altura} = {vol_m3} m³.\n3. Conversão: {vol_m3} x 1000 = {vol_litros} litros."
+        "id": 2, "tema": "Logaritmos e Escalas",
+        "pergunta": pergunta,
+        "opcoes": [f"{res}", f"{int(res)+2}", f"{int(res)*2}", "10"],
+        "correta": f"{res}",
+        "explicacao": expl
     }
     random.shuffle(q2['opcoes'])
     questoes.append(q2)
 
-    # ------------------------------------------------------------------
-    # MOTOR 3: REGRA DE TRÊS (Viagens e Consumo)
-    # ------------------------------------------------------------------
-    km_litro = random.randint(8, 14)
-    horas_viagem = random.randint(2, 5)
-    velocidade = random.choice([80, 90, 100, 110])
-    distancia = velocidade * horas_viagem
-    # Garante que a divisão seja exata ou próxima
-    litros_gastos = distancia / km_litro
+    # --- TEMA 3: ANÁLISE COMBINATÓRIA (Senhas / Times) ---
+    n = random.randint(5, 8) # Pessoas
+    p = 3 # Pódio (Ouro, Prata, Bronze)
+    # Arranjo: A(n,p) = n! / (n-p)!
+    arranjo = math.perm(n, p)
     
     q3 = {
-        "id": 3,
-        "tema": "Grandezas Proporcionais",
-        "pergunta": f"Um carro faz, em média, {km_litro} km/L de gasolina na estrada. O motorista planeja uma viagem de {horas_viagem} horas mantendo uma velocidade média constante de {velocidade} km/h. Quantos litros de combustível, aproximadamente, serão consumidos nesse trajeto?",
-        "opcoes": [
-            f"{litros_gastos:.1f} L", 
-            f"{litros_gastos + 5:.1f} L", 
-            f"{distancia} L", 
-            f"{distancia / 10:.1f} L"
-        ],
-        "correta": f"{litros_gastos:.1f} L",
-        "dica_mestra": "Primeiro descubra a distância total (Velocidade x Tempo). Depois divida pelo consumo do carro.",
-        "explicacao": f"1. Distância total: {velocidade} km/h x {horas_viagem} h = {distancia} km.\n2. Consumo: {distancia} km ÷ {km_litro} km/L = {litros_gastos:.1f} litros."
+        "id": 3, "tema": "Análise Combinatória",
+        "pergunta": f"Em uma final olímpica de natação, {n} atletas disputam as medalhas de Ouro, Prata e Bronze. Não havendo empates, de quantas maneiras diferentes o pódio pode ser formado?",
+        "opcoes": [f"{arranjo}", f"{math.comb(n,p)}", f"{n*p}", f"{n**p}"],
+        "correta": f"{arranjo}",
+        "explicacao": f"Como a ordem importa (Ouro é diferente de Prata), usamos Arranjo. \nCálculo: {n} opções para Ouro x {n-1} para Prata x {n-2} para Bronze = {n}x{n-1}x{n-2} = {arranjo}."
     }
     random.shuffle(q3['opcoes'])
     questoes.append(q3)
-    
-    # ------------------------------------------------------------------
-    # MOTOR 4: ANÁLISE COMBINATÓRIA (Senhas)
-    # ------------------------------------------------------------------
-    digitos = random.randint(3, 5)
-    total_poss = 10 ** digitos
-    
-    q4 = {
-        "id": 4,
-        "tema": "Análise Combinatória",
-        "pergunta": f"Um banco digital solicitou que seus clientes criassem uma nova senha numérica de {digitos} dígitos para transações via app. Sabendo que podem ser usados os algarismos de 0 a 9 e que a repetição é permitida, quantas senhas distintas podem ser formadas?",
-        "opcoes": [
-            f"{total_poss}", 
-            f"{10 * digitos}", 
-            f"{9 ** digitos}", 
-            f"{total_poss * 10}"
-        ],
-        "correta": f"{total_poss}",
-        "dica_mestra": "Use o Princípio Fundamental da Contagem. Quantas opções temos para a 1ª casa? E para a 2ª?",
-        "explicacao": f"Para cada um dos {digitos} espaços, temos 10 opções de números (0-9).\nCálculo: 10 x 10... ({digitos} vezes) = 10^{digitos} = {total_poss}."
-    }
-    random.shuffle(q4['opcoes'])
-    questoes.append(q4)
 
-    # ------------------------------------------------------------------
-    # MOTOR 5: ESTATÍSTICA (Média de Notas)
-    # ------------------------------------------------------------------
-    n1 = random.randint(50, 80)
-    n2 = random.randint(60, 90)
-    n3 = random.randint(40, 70)
-    media = (n1 + n2 + n3) / 3
-    
-    q5 = {
-        "id": 5,
-        "tema": "Estatística Básica",
-        "pergunta": f"Um estudante obteve as seguintes notas nas três etapas do ENEM Simulado: {n1}, {n2} e {n3}. Qual foi a média aritmética atingida por esse estudante?",
-        "opcoes": [
-            f"{media:.1f}", 
-            f"{media + 5:.1f}", 
-            f"{media - 2:.1f}", 
-            f"{(n1+n2+n3)}"
-        ],
-        "correta": f"{media:.1f}",
-        "dica_mestra": "Para achar a média, some todos os valores e divida pela quantidade de itens somados.",
-        "explicacao": f"Soma: {n1} + {n2} + {n3} = {n1+n2+n3}.\nMédia: {n1+n2+n3} ÷ 3 = {media:.1f}."
-    }
-    random.shuffle(q5['opcoes'])
-    questoes.append(q5)
+    return questoes
 
-    # Sorteia 3 questões dessas 5 geradas
-    selecionadas = random.sample(questoes, 3)
+# ==============================================================================
+# 🧠 CÉREBRO PRINCIPAL (IA GEMINI COM INSISTÊNCIA)
+# ==============================================================================
+def gerar_questoes_agora():
     
-    # Renumera para 1, 2, 3
-    for i, q in enumerate(selecionadas):
-        q['id'] = i + 1
-        
-    return selecionadas
+    # 1. TENTA A IA (GOOGLE) - 3 TENTATIVAS AGRESSIVAS
+    # Usamos temperatura alta para criatividade máxima
+    config_criativa = genai.types.GenerationConfig(temperature=1.0)
+    
+    for tentativa in range(3):
+        try:
+            genai.configure(api_key=minha_chave)
+            model = genai.GenerativeModel('models/gemini-flash-latest', generation_config=config_criativa)
+            
+            prompt = """
+            Aja como o Banco Nacional de Itens do INEP (ENEM).
+            Gere um JSON com 3 questões de matemática NÍVEL DIFÍCIL.
+            
+            REGRAS OBRIGATÓRIAS:
+            1. **Interdisciplinaridade:** Contexto longo (Biologia, Geografia, Economia).
+            2. **Complexidade:** Exija raciocínio lógico, não apenas conta.
+            3. **Formato:** JSON puro.
+            
+            FORMATO:
+            [{"id":1, "tema":"Tema", "pergunta":"Texto longo...", "opcoes":["A","B"], "correta":"A", "explicacao":"Passo a passo..."}]
+            """
+            
+            # Timeout curto para não travar
+            response = model.generate_content(prompt)
+            texto = response.text.replace("```json", "").replace("```", "").strip()
+            
+            if not texto: raise ValueError("Vazio")
+            
+            dados = json.loads(texto)
+            
+            # Embaralha e retorna se deu certo
+            for i, q in enumerate(dados):
+                random.shuffle(q['opcoes'])
+                q['id'] = i + 1
+            return dados
 
-# Função principal (Interface única)
-def buscar_lote_questoes():
-    # Não precisa mais de Google Key, nem Try/Except
-    # Essa IA roda direto no processador
-    return gerar_ia_simbolica()
+        except Exception as e:
+            # Se deu erro, espera 1 segundo e tenta de novo
+            time.sleep(1)
+            continue
+
+    # 2. SE A IA FALHAR NAS 3 TENTATIVAS, ATIVA O MOTOR CIENTÍFICO
+    # Isso garante que SEMPRE haverá questão complexa, nunca "erro".
+    return gerar_complexidade_cientifica()
