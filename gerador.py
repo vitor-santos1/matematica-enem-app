@@ -1,152 +1,135 @@
-import google.generativeai as genai
-import json
-import streamlit as st
 import random
-import time
 import math
 
-# --- CONFIGURAÇÃO DA CHAVE ---
-try:
-    minha_chave = st.secrets["GOOGLE_API_KEY"]
-except:
-    minha_chave = "COLE_SUA_CHAVE_AQUI"
-
 # ==============================================================================
-# ☢️ MOTOR DE COMPLEXIDADE (FALLBACK CIENTÍFICO)
+# 🧠 VITOR-AI: MOTOR DE GERAÇÃO PROCEDURAL (SEM INTERNET)
 # ==============================================================================
-# Este motor gera questões de alto nível (Logaritmo, Exponencial, Combinatória)
-# Ele entra em ação apenas se a IA do Google estiver travada.
+# Esta "IA" constrói questões frase por frase usando bancos de dados semânticos.
+# Resultado: Questões infinitas, complexas e sempre diferentes.
 
-def gerar_complexidade_cientifica():
+def get_texto(tipo):
+    """Banco de dados criativo para montar frases dinâmicas."""
+    db = {
+        "cientistas": ["Um engenheiro nuclear", "Uma bióloga marinha", "Um pesquisador da USP", "Um químico industrial", "Um geólogo"],
+        "locais": ["em um laboratório de alta tecnologia", "em uma expedição na Antártida", "durante uma análise de campo", "no centro de controle"],
+        "verbos_crescimento": ["observou um crescimento acelerado", "notou uma multiplicação exponencial", "registrou um aumento progressivo"],
+        "verbos_queda": ["detectou um decaimento radioativo", "mediu a desvalorização do ativo", "analisou a redução da concentração"],
+        "microorganismos": ["de uma colônia de bactérias", "de uma cultura de vírus", "de algas microscópicas", "de células-tronco"],
+        "elementos_quimicos": ["do Isótopo Césio-137", "de uma amostra de Urânio", "de um composto instável", "de Carbono-14"],
+        "conectivos_dica": ["Lembre-se que", "Note que", "Considere o fato de que", "Atenção à regra:"],
+    }
+    return random.choice(db[tipo])
+
+def gerar_ia_propria():
     questoes = []
 
-    # --- TEMA 1: FUNÇÃO EXPONENCIAL (Crescimento de Bactérias / Meia-Vida) ---
-    tipo = random.choice(["bacterias", "radioativo"])
+    # ------------------------------------------------------------------
+    # MOTOR 1: FUNÇÃO EXPONENCIAL (Crescimento/Decaimento)
+    # ------------------------------------------------------------------
+    # A IA decide na hora se é uma questão de Biologia (Crescer) ou Física (Cair)
+    modo = random.choice(["biologia", "fisica"])
     
-    if tipo == "bacterias":
-        inicial = random.choice([100, 200, 500])
-        taxa = 2 # Dobra
-        tempo_h = random.randint(3, 6)
-        final = inicial * (taxa ** tempo_h)
-        texto_base = f"Em um experimento biológico controlado, uma cultura de bactérias se reproduz de forma binária, duplicando sua população a cada hora. No início do experimento (t=0), haviam {inicial} microrganismos."
-        pergunta = f"{texto_base} Considerando que as condições de temperatura e nutrientes permaneceram ideais, qual será a população exata de bactérias após {tempo_h} horas?"
-        expl = f"Função Exponencial: N(t) = N0 . 2^t. \nCálculo: {inicial} . 2^{tempo_h} = {inicial} . {2**tempo_h} = {final}."
+    if modo == "biologia":
+        sujeito = get_texto("cientistas")
+        local = get_texto("locais")
+        verbo = get_texto("verbos_crescimento")
+        objeto = get_texto("microorganismos")
         
-    else: # Radioativo
-        inicial = random.choice([100, 80, 64]) # Gramas
-        meia_vida = random.randint(10, 30) # Anos
+        inicial = random.choice([100, 200, 500, 1000])
+        tempo = random.randint(3, 8) # horas
+        base = 2 # dobra
+        final = inicial * (base ** tempo)
+        
+        pergunta = f"{sujeito}, trabalhando {local}, {verbo} {objeto}. No início do experimento, haviam exatos {inicial} organismos. Sabendo que essa população dobra a cada hora, qual será a quantidade total após {tempo} horas?"
+        dica = f"{get_texto('conectivos_dica')} uma duplicação a cada hora é uma Função Exponencial de base 2."
+        expl = f"Fórmula: N(t) = N0 . 2^t\nCálculo: {inicial} . 2^{tempo} = {inicial} . {2**tempo} = {final} organismos."
+    
+    else: # Fisica (Radioatividade)
+        sujeito = get_texto("cientistas")
+        objeto = get_texto("elementos_quimicos")
+        verbo = get_texto("verbos_queda")
+        
+        inicial = random.choice([100, 80, 64, 128]) # gramas
+        meia_vida = random.randint(10, 30) # anos
         ciclos = random.randint(2, 4)
-        tempo_passado = meia_vida * ciclos
+        tempo_total = meia_vida * ciclos
         final = inicial / (2 ** ciclos)
-        texto_base = f"O Césio-137 é um isótopo radioativo cuja meia-vida é de aproximadamente {meia_vida} anos. Uma amostra isolada continha inicialmente {inicial}g desse material."
-        pergunta = f"{texto_base} Passados exatos {tempo_passado} anos, qual a massa restante de material radioativo nessa amostra?"
-        expl = f"Meia-vida significa que a massa cai pela metade a cada ciclo. \nTempo passado: {tempo_passado} anos = {ciclos} meias-vidas. \nCálculo: {inicial} dividido por 2, {ciclos} vezes = {final}g."
+        
+        pergunta = f"{sujeito} {verbo} {objeto}. A amostra inicial tinha {inicial}g. Sabendo que a meia-vida desse material é de {meia_vida} anos, qual será a massa restante após {tempo_total} anos?"
+        dica = f"{get_texto('conectivos_dica')} a cada 'meia-vida', a massa é dividida por 2."
+        expl = f"Tempo passado: {tempo_total} anos. Isso equivale a {ciclos} meias-vidas ({tempo_total}/{meia_vida}).\nCálculo: {inicial} dividido por 2, {ciclos} vezes = {final}g."
 
     q1 = {
-        "id": 1, "tema": "Função Exponencial e Biologia/Física",
+        "id": 1, "tema": f"Função Exponencial ({modo.capitalize()})",
         "pergunta": pergunta,
-        "opcoes": [f"{final}", f"{final*2}", f"{final/2}", f"{inicial + tempo_h if tipo=='bacterias' else inicial - ciclos}"],
-        "correta": f"{final}",
-        "explicacao": expl
+        "opcoes": [f"{final}", f"{final*2}", f"{inicial}", f"{final/2}"],
+        "correta": f"{final}", "dica_mestra": dica, "explicacao": expl
     }
     random.shuffle(q1['opcoes'])
     questoes.append(q1)
 
-    # --- TEMA 2: LOGARITMOS (Terremotos / pH Químico) ---
-    if random.choice([True, False]):
-        # Escala Richter
-        energia_base = 1000
-        fator = random.randint(4, 8) # Potência de 10
-        energia_real = energia_base * (10**fator)
-        magnitude = math.log10(energia_real) - math.log10(energia_base) # Simplificado M = log(E)
-        # Vamos usar a fórmula M = log10(Energia) para simplificar didaticamente
-        magnitude_real = fator
+    # ------------------------------------------------------------------
+    # MOTOR 2: MATEMÁTICA FINANCEIRA (Histórias de Fraude/Lucro)
+    # ------------------------------------------------------------------
+    # Contexto: Investimento ou Dívida
+    tipo_fin = random.choice(["investimento", "divida"])
+    capital = random.choice([1000, 2000, 5000, 10000])
+    taxa = random.choice([5, 10, 20])
+    meses = 2
+    
+    if tipo_fin == "investimento":
+        contexto = f"Um jovem empreendedor decidiu aplicar R$ {capital},00 em uma startup de tecnologia."
+        acao = "O contrato prometia um retorno de"
+        final_simples = capital + (capital * (taxa/100) * meses)
+        # Juros compostos simulados na mao
+        m1 = capital * (1 + taxa/100)
+        m2 = m1 * (1 + taxa/100)
+        final_composto = int(m2)
+        pergunta_fim = f"Se o regime for de Juros Compostos, qual o montante após {meses} meses?"
         
-        pergunta = f"A magnitude M de um terremoto na escala Richter pode ser calculada pelo logaritmo decimal da energia liberada E (em joules), dada pela fórmula simplificada M = log(E). Se um terremoto liberou uma energia de 10^{magnitude_real} Joules, qual foi sua magnitude?"
-        res = f"{magnitude_real}"
-        expl = f"Propriedade dos Logaritmos: log(10^x) = x. \nSe a energia é 10^{magnitude_real}, então log(10^{magnitude_real}) = {magnitude_real}."
-    else:
-        # pH Químico
-        concentracao = random.choice([2, 3, 4, 5]) # 10^-x
-        ph = concentracao
-        pergunta = f"O potencial hidrogeniônico (pH) de uma solução é dado pela fórmula pH = -log[H+], onde [H+] é a concentração de íons de hidrogênio em mol/L. Uma análise em laboratório indicou que uma amostra de chuva ácida possui [H+] = 10^(-{ph}) mol/L. Qual o pH dessa chuva?"
-        res = f"{ph}"
-        expl = f"Fórmula: pH = -log(10^-{ph}). \nPela propriedade de logaritmos: log(10^x) = x. \nLogo: -(-{ph}) = {ph}."
+    else: # Divida
+        contexto = f"Devido a um imprevisto médico, uma família precisou pegar um empréstimo de R$ {capital},00 no banco."
+        acao = "A taxa cobrada pelo banco foi de"
+        m1 = capital * (1 + taxa/100)
+        m2 = m1 * (1 + taxa/100)
+        final_composto = int(m2)
+        pergunta_fim = f"Considerando Juros Compostos, qual o valor total da dívida após {meses} meses?"
 
     q2 = {
-        "id": 2, "tema": "Logaritmos e Escalas",
-        "pergunta": pergunta,
-        "opcoes": [f"{res}", f"{int(res)+2}", f"{int(res)*2}", "10"],
-        "correta": f"{res}",
-        "explicacao": expl
+        "id": 2, "tema": "Matemática Financeira",
+        "pergunta": f"{contexto} {acao} {taxa}% ao mês. {pergunta_fim}",
+        "opcoes": [f"R$ {final_composto},00", f"R$ {capital},00", f"R$ {int(capital * 2)},00", f"R$ {int(final_composto * 1.5)},00"],
+        "correta": f"R$ {final_composto},00",
+        "dica_mestra": "Juros Compostos é 'Juro sobre Juro'. Calcule mês a mês.",
+        "explicacao": f"Mês 1: {capital} + {taxa}% = {int(m1)}. \nMês 2: {int(m1)} + {taxa}% = {final_composto}."
     }
     random.shuffle(q2['opcoes'])
     questoes.append(q2)
 
-    # --- TEMA 3: ANÁLISE COMBINATÓRIA (Senhas / Times) ---
-    n = random.randint(5, 8) # Pessoas
-    p = 3 # Pódio (Ouro, Prata, Bronze)
-    # Arranjo: A(n,p) = n! / (n-p)!
-    arranjo = math.perm(n, p)
+    # ------------------------------------------------------------------
+    # MOTOR 3: ANÁLISE COMBINATÓRIA (Situações de Risco)
+    # ------------------------------------------------------------------
+    # Contexto: Senhas ou Cofres
+    digitos = random.randint(3, 5)
+    total = 10 ** digitos
+    cenario = random.choice([
+        f"O cofre de segurança máxima de um banco possui uma senha digital de {digitos} dígitos.",
+        f"Para desbloquear um smartphone apreendido, a perícia precisa descobrir um código de {digitos} dígitos."
+    ])
     
     q3 = {
         "id": 3, "tema": "Análise Combinatória",
-        "pergunta": f"Em uma final olímpica de natação, {n} atletas disputam as medalhas de Ouro, Prata e Bronze. Não havendo empates, de quantas maneiras diferentes o pódio pode ser formado?",
-        "opcoes": [f"{arranjo}", f"{math.comb(n,p)}", f"{n*p}", f"{n**p}"],
-        "correta": f"{arranjo}",
-        "explicacao": f"Como a ordem importa (Ouro é diferente de Prata), usamos Arranjo. \nCálculo: {n} opções para Ouro x {n-1} para Prata x {n-2} para Bronze = {n}x{n-1}x{n-2} = {arranjo}."
+        "pergunta": f"{cenario} Sabendo que os dígitos podem ser quaisquer números de 0 a 9 e que podem se repetir, quantas tentativas no máximo seriam necessárias para descobrir o código na força bruta?",
+        "opcoes": [f"{total}", f"{10*digitos}", f"{9**digitos}", f"{total*10}"],
+        "correta": f"{total}",
+        "dica_mestra": "Princípio Fundamental da Contagem: 10 opções para a primeira casa, 10 para a segunda...",
+        "explicacao": f"Temos {digitos} posições. Cada uma tem 10 possibilidades.\nConta: 10 elevado a {digitos} = {total} combinações."
     }
     random.shuffle(q3['opcoes'])
     questoes.append(q3)
 
     return questoes
 
-# ==============================================================================
-# 🧠 CÉREBRO PRINCIPAL (IA GEMINI COM INSISTÊNCIA)
-# ==============================================================================
+# Função que o app.py vai chamar (Nome deve ser igual ao do app.py)
 def gerar_questoes_agora():
-    
-    # 1. TENTA A IA (GOOGLE) - 3 TENTATIVAS AGRESSIVAS
-    # Usamos temperatura alta para criatividade máxima
-    config_criativa = genai.types.GenerationConfig(temperature=1.0)
-    
-    for tentativa in range(3):
-        try:
-            genai.configure(api_key=minha_chave)
-            model = genai.GenerativeModel('models/gemini-flash-latest', generation_config=config_criativa)
-            
-            prompt = """
-            Aja como o Banco Nacional de Itens do INEP (ENEM).
-            Gere um JSON com 3 questões de matemática NÍVEL DIFÍCIL.
-            
-            REGRAS OBRIGATÓRIAS:
-            1. **Interdisciplinaridade:** Contexto longo (Biologia, Geografia, Economia).
-            2. **Complexidade:** Exija raciocínio lógico, não apenas conta.
-            3. **Formato:** JSON puro.
-            
-            FORMATO:
-            [{"id":1, "tema":"Tema", "pergunta":"Texto longo...", "opcoes":["A","B"], "correta":"A", "explicacao":"Passo a passo..."}]
-            """
-            
-            # Timeout curto para não travar
-            response = model.generate_content(prompt)
-            texto = response.text.replace("```json", "").replace("```", "").strip()
-            
-            if not texto: raise ValueError("Vazio")
-            
-            dados = json.loads(texto)
-            
-            # Embaralha e retorna se deu certo
-            for i, q in enumerate(dados):
-                random.shuffle(q['opcoes'])
-                q['id'] = i + 1
-            return dados
-
-        except Exception as e:
-            # Se deu erro, espera 1 segundo e tenta de novo
-            time.sleep(1)
-            continue
-
-    # 2. SE A IA FALHAR NAS 3 TENTATIVAS, ATIVA O MOTOR CIENTÍFICO
-    # Isso garante que SEMPRE haverá questão complexa, nunca "erro".
-    return gerar_complexidade_cientifica()
+    return gerar_ia_propria()
