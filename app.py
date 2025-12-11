@@ -13,11 +13,13 @@ st.markdown("""
 </style>""", unsafe_allow_html=True)
 
 st.title("🎓 IA Tutor: Matemática ENEM")
-st.write("Treinamento intensivo com inteligência gerativa.")
+st.write("Simulado Inteligente de Alta Complexidade")
 
 # --- INICIALIZAÇÃO ---
 if 'questoes' not in st.session_state:
-    st.session_state.questoes = gerador.buscar_lote_questoes()
+    # AQUI ESTAVA O ERRO: Mudei para o nome correto da função
+    with st.spinner("Preparando o motor de inteligência..."):
+        st.session_state.questoes = gerador.gerar_questoes_agora()
     
 if 'indice' not in st.session_state:
     st.session_state.indice = 0
@@ -26,14 +28,15 @@ if 'indice' not in st.session_state:
     st.session_state.acertou_atual = False
 
 # --- TELA DE RESULTADO FINAL ---
-if st.session_state.indice >= len(st.session_state.questoes):
+if not st.session_state.questoes or st.session_state.indice >= len(st.session_state.questoes):
     st.balloons()
     st.success(f"🏆 FIM DO TREINO! Você acertou {st.session_state.acertos} de {len(st.session_state.questoes)}.")
     
-    if st.button("🔄 Gerar Novo Simulado"):
-        with st.spinner("A IA está criando novas situações..."):
-            time.sleep(0.5) # Efeito visual
-            st.session_state.questoes = gerador.buscar_lote_questoes()
+    if st.button("🔄 Gerar Novo Simulado Nível Hard"):
+        with st.spinner("A IA está criando novas situações complexas..."):
+            time.sleep(0.5) 
+            # Chama a função certa novamente
+            st.session_state.questoes = gerador.gerar_questoes_agora()
             st.session_state.indice = 0
             st.session_state.acertos = 0
             st.session_state.respondido = False
@@ -52,7 +55,9 @@ st.markdown(f"### {q['pergunta']}")
 
 # Botão de Dica
 with st.expander("💡 Precisa de uma ajuda?"):
-    st.markdown(f"<div class='dica'><b>Dica do Tutor:</b> {q['dica_mestra']}</div>", unsafe_allow_html=True)
+    # Garante que não quebre se a dica vier vazia
+    dica = q.get('dica_mestra') or "Leia atentamente o enunciado e identifique as variáveis."
+    st.markdown(f"<div class='dica'><b>Dica do Tutor:</b> {dica}</div>", unsafe_allow_html=True)
 
 # Área de Resposta
 if not st.session_state.respondido:
